@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Categoria, Posts, User, Comentario
+from spa.models import Categoria, Posts, User, Comentario
+
+
 
 
 # Register your models here.

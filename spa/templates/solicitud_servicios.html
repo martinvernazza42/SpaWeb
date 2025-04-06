@@ -1,0 +1,14 @@
+<form method="POST">
+    {% csrf_token %}
+    <label>Nombre:</label><input type="text" name="nombre"><br>
+    <label>Email:</label><input type="email" name="email"><br>
+    <label>Servicio:</label>
+    <select name="servicio">
+      <option>Anti-stress</option>
+      <option>Depilación facial</option>
+      <!-- Agrega todos los servicios -->
+    </select><br>
+    <label>Mensaje:</label><textarea name="mensaje"></textarea><br>
+    <button type="submit">Enviar consulta</button>
+  </form>
+  

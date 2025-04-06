@@ -1,0 +1,17 @@
+<!-- spa/templates/seleccionar_turno.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Seleccioná tu turno</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <h3>Datos personales</h3>
+    {{ cliente_form.as_p }}
+
+    <h3>Servicio y turno</h3>
+    {{ turno_form.as_p }}
+
+    <button type="submit">Reservar turno</button>
+</form>
+{% endblock %}

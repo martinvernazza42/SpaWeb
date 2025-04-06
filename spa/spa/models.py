@@ -34,10 +34,44 @@ class Posts(models.Model):
 
 # Clase Comentario
 class Comentario(models.Model):
-    posts = models.ForeignKey('post.Posts', on_delete=models.CASCADE, related_name='comentarios')
+    posts = models.ForeignKey('Posts', on_delete=models.CASCADE, related_name='comentarios')
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comentarios')
     texto = models.TextField()
     fecha = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.texto
+
+# spa/models.py
+from django.db import models
+
+class Servicio(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+
+    def __str__(self):
+        return self.nombre
+
+class Cliente(models.Model):
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    email = models.EmailField()
+    telefono = models.CharField(max_length=20)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+
+class Turno(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    fecha = models.DateField()
+    hora = models.TimeField()
+
+    def __str__(self):
+        return f"{self.cliente} - {self.servicio} - {self.fecha} {self.hora}"
+
+
+class Consulta(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    mensaje = models.TextField()
