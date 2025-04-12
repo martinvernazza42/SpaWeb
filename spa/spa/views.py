@@ -15,3 +15,6 @@ def turnos(request):
 
 def perfil(request):
     return render(request, 'perfil.html')
+
+def inicio(request):
+    return render(request, 'base.html')
