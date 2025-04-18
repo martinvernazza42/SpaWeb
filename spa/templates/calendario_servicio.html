@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Turnos en {{ servicio.nombre }} — {{ month }}/{{ year }}</h2>
+
+  <table class="table table-bordered text-center">
+    <thead class="table-light">
+      <tr>
+        {% for dayname in day_names %}
+          <th>{{ dayname }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for week in month_days %}
+        <tr>
+          {% for day in week %}
+            <td class="{% if day.month != month %}bg-light{% endif %}">
+              {% if day.month == month %}
+                {% if day.day in available %}
+                  <a href="{% url 'reservar_por_fecha' servicio.id year month day.day %}">
+                    <span class="badge bg-success">X</span>
+                  </a>
+                {% else %}
+                  {{ day.day }}
+                {% endif %}
+              {% endif %}
+            </td>
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-between mt-3">
+    <a href="?year={{ year }}&month={{ month|add:-1 }}" class="btn btn-outline-secondary">&laquo; Mes anterior</a>
+    <a href="?year={{ year }}&month={{ month|add:1 }}"  class="btn btn-outline-secondary">Mes siguiente &raquo;</a>
+  </div>
+
+  <a href="{% url 'servicios' %}" class="btn btn-link mt-3">&laquo; Volver a Servicios</a>
+</div>
+{% endblock %}

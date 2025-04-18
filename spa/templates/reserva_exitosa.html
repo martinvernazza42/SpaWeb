@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5" style="max-width:600px;">
+  <div class="alert alert-success text-center">
+    <h3>¡Turno reservado con éxito!</h3>
+    <p><strong>Cliente:</strong>
+       {{ turno.cliente.user.get_full_name|default:turno.cliente.user.username }}
+    </p>
+    <p><strong>Servicio:</strong> {{ turno.servicio.nombre }}</p>
+    <p><strong>Fecha:</strong> {{ turno.fecha }}</p>
+    <p><strong>Hora:</strong> {{ turno.hora|time:"H:i" }}</p>
+  </div>
+
+  <div class="d-flex justify-content-center gap-3">
+    <a href="{% url 'mis_turnos' %}" class="btn btn-primary">Ver mis turnos</a>
+    </a>
+    <a href="{% url 'servicios' %}" class="btn btn-link">
+      Reservar otro
+    </a>
+  </div>
+</div>
+{% endblock %}

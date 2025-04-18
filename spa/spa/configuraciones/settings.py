@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'spa',
-    'apps.post',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +66,10 @@ TEMPLATES = [
         },
     },
 ]
+# Después de tu configuración de TEMPLATES, etc.
+
+LOGIN_REDIRECT_URL = '/perfil/'     # o el nombre de tu URL, p. ej. 'perfil'
+LOGOUT_REDIRECT_URL = '/login/'     # opcional: adónde ir tras logout
 
 WSGI_APPLICATION = 'spa.wsgi.application'
 
