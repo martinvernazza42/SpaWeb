@@ -1,0 +1,189 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container my-5">
+  <!-- Título principal de la página -->
+  <h1 class="text-center fw-bold text-secondary">
+    Nuestros Servicios Individuales
+  </h1>
+
+  <!-- Card de Masajes -->
+  <div
+    class="card mb-5 shadow-sm"
+    style="max-width: 1350px; margin-right: 20px"
+  >
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Masajes</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen -->
+      <img
+        src="{% static 'masajes_relajante.jpg' %}"
+        alt="Masajes relajante"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px"
+      />
+
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Anti-Stress</h5>
+        <p class="card-text">
+          Los masajes anti-stress no solo mejoran el bienestar físico, sino que
+          también favorecen la salud emocional, ayudando a reducir la ansiedad,
+          mejorar la calidad del sueño y promover una sensación general de
+          equilibrio. Son perfectos para quienes llevan un estilo de vida
+          agitado y necesitan reconectar con su cuerpo en un ambiente de calma.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Descontracturante</h5>
+        <p class="card-text">
+          Su principal objetivo es liberar la tensión acumulada en las fibras
+          musculares, mejorar la circulación y recuperar la elasticidad del
+          cuerpo. Es ideal para personas que realizan actividades físicas
+          exigentes, pasan muchas horas frente a una computadora o experimentan
+          dolores musculares crónicos.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Con Piedras Calientes</h5>
+        <p class="card-text">
+          Combinación perfecta de calor y masaje para lograr una relajación
+          profunda y un efectivo alivio muscular. En este tratamiento, se
+          utilizan piedras volcánicas calentadas a una temperatura segura, que
+          se colocan estratégicamente sobre puntos clave del cuerpo y también se
+          usan para masajear suavemente. El calor penetra profundamente en los
+          músculos, dilatando los vasos sanguíneos, mejorando la circulación y
+          ayudando a liberar tensiones acumuladas.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Circulatorios</h5>
+        <p class="card-text">
+          Estimula de forma suave y efectiva la circulación sanguínea y
+          linfática, favoreciendo la oxigenación de los tejidos y la eliminación
+          de toxinas. Este tipo de masaje se realiza con maniobras rítmicas,
+          ascendentes y con una presión moderada, especialmente en piernas y
+          zonas con retención de líquidos.
+        </p>
+        <a href="{% url 'turnos' %}" class="btn" style="background-color: #d63384; color: white;">Solicitar turno</a>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- Card de Belleza -->
+ <div class="card mb-5 shadow-sm" style="max-width: 1300px; margin-left: auto; margin-right: auto;">
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Belleza</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen 1 -->
+      <img
+        src="{% static 'belleza1.jpg' %}"
+        alt="Lifting de Pestañas"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px;"
+      />
+
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Lifting de Pestañas</h5>
+        <p class="card-text">
+          El lifting de pestañas es un tratamiento que proporciona un rizado natural y duradero a las pestañas. 
+          Ideal para quienes desean una mirada más expresiva sin necesidad de extensiones ni mascaras. 
+          Perfecto para destacar la belleza natural de los ojos.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Depilación Facial</h5>
+        <p class="card-text">
+          La depilación facial es un tratamiento preciso y eficaz para eliminar vello no deseado en el rostro. 
+          Usamos técnicas y productos suaves para garantizar una piel suave y sin irritaciones. Ideal para áreas delicadas como el labio superior, cejas y mentón.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Belleza de Manos y Pies</h5>
+        <p class="card-text">
+          Un servicio integral que incluye manicura y pedicura para mantener tus manos y pies impecables. 
+          Ofrecemos tratamientos hidratantes y reparadores, asegurando una piel suave y uñas bien cuidadas, para que luzcas siempre radiante.
+        </p>
+        <a href="{% url 'turnos' %}" class="btn" style="background-color: #d63384; color: white;">Solicitar turno</a>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- Card de Tratamientos Faciales -->
+ <div class="card mb-5 shadow-sm" style="max-width: 1300px; margin-left: auto; margin-right: auto;">
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Tratamientos Faciales</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen 1 -->
+      <img
+        src="{% static 'tratamiento_facial.jpg' %}"
+        alt="Punta de Diamante"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px;"
+      />
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Punta de Diamante</h5>
+        <p class="card-text">
+          Este tratamiento utiliza una técnica de microdermoabrasión con punta de diamante para exfoliar la piel, 
+          eliminando células muertas y estimulando la regeneración celular. Ideal para mejorar la textura de la piel, 
+          reducir manchas y líneas de expresión, dejándola suave y radiante.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Limpieza Profunda + Hidratación</h5>
+        <p class="card-text">
+          Una limpieza profunda que elimina impurezas, exceso de sebo y células muertas. Después, se aplica una 
+          hidratación intensa para restaurar la vitalidad de la piel. Perfecto para mantener una piel fresca, libre de impurezas 
+          y con un aspecto saludable.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Crio Frecuencia "Shock" Térmico</h5>
+        <p class="card-text">
+          Este tratamiento utiliza tecnología de frío y calor para estimular la producción de colágeno y mejorar la circulación 
+          sanguínea en la piel. Ideal para reducir la apariencia de líneas finas y flacidez, dejando la piel más firme y tonificada.
+        </p>
+        <a href="{% url 'turnos' %}" class="btn" style="background-color: #d63384; color: white;">Solicitar turno</a>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- Card de Tratamientos Corporales -->
+ <div class="card mb-5 shadow-sm" style="max-width: 1300px; margin-left: auto; margin-right: auto;">
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Tratamientos Corporales</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen 1 -->
+      <img
+        src="{% static 'velaslim.jpg' %}"
+        alt="Velaslim"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px;"
+      />
+      
+      
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Velaslim</h5>
+        <p class="card-text">
+          El tratamiento Velaslim utiliza una combinación de técnicas como la radiofrecuencia y la succión para reducir la
+          grasa localizada, mejorar la circulación y tonificar la piel. Es ideal para aquellos que desean reducir centímetros y
+          mejorar el aspecto de la piel en áreas como abdomen, muslos y caderas.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Dermohealth</h5>
+        <p class="card-text">
+          Dermohealth es un tratamiento que combina tecnología avanzada para la eliminación de la celulitis, la flacidez y la
+          mejora de la circulación sanguínea. Utiliza técnicas como la radiofrecuencia y el masaje profundo para revitalizar y
+          rejuvenecer la piel, logrando una apariencia más firme y saludable.
+        </p>
+
+        <h5 class="fw-bold border-bottom pb-1">Ultracavitación</h5>
+        <p class="card-text">
+          La ultracavitación es una técnica no invasiva que utiliza ultrasonido para eliminar la grasa localizada y combatir la
+          celulitis. Ideal para moldear el cuerpo y reducir medidas en zonas específicas como abdomen, muslos y brazos, sin
+          necesidad de cirugía ni tiempo de recuperación.
+        </p>
+        <a href="{% url 'turnos' %}" class="btn" style="background-color: #d63384; color: white;">Solicitar turno</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

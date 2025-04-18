@@ -1,7 +1,92 @@
 <!-- templates/turnos.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<div class="container my-5">
+  <h1 class="text-center fw-bold text-secondary mb-4">Seleccioná tu turno</h1>
 
-{% block content %}
-<h1>Turnos</h1>
-<p>Solicitá tu turno para disfrutar de nuestros servicios.</p>
+  <form method="post" class="mx-auto" style="max-width: 600px">
+    {% csrf_token %}
+
+    <!-- Datos personales -->
+    <h4 class="fw-bold text-primary mb-3">Datos personales</h4>
+
+    <!-- Nombre -->
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre</label>
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          name="nombre"
+          placeholder="Tu nombre"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- Email -->
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <div class="input-group">
+        <input
+          type="email"
+          class="form-control"
+          name="email"
+          placeholder="tunombre@example.com"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- Teléfono -->
+    <div class="mb-4">
+      <label for="telefono" class="form-label">Teléfono</label>
+      <div class="input-group">
+        <input
+          type="text"
+          class="form-control"
+          name="telefono"
+          placeholder="Ej: 3412345678"
+          required
+        />
+      </div>
+    </div>
+
+    <!-- Servicio -->
+    <h4 class="fw-bold text-primary mb-3">Servicio y turno</h4>
+
+    <div class="mb-3">
+      <label for="servicio" class="form-label">Servicio</label>
+      <select class="form-select" name="servicio" required>
+        <option value="" selected disabled>Elegí un servicio</option>
+        <option value="masajes">Masajes</option>
+        <option value="belleza">Belleza</option>
+        <option value="faciales">Tratamientos Faciales</option>
+        <option value="corporales">Tratamientos Corporales</option>
+        <option value="hidromasajes">Hidromasajes</option>
+        <option value="yoga">Yoga</option>
+      </select>
+    </div>
+
+    <!-- Fecha -->
+    <div class="mb-3">
+      <label for="fecha" class="form-label">Fecha</label>
+      <div class="input-group">
+        <input type="date" class="form-control" name="fecha" required />
+      </div>
+    </div>
+
+    <!-- Hora -->
+    <div class="mb-4">
+      <label for="hora" class="form-label">Hora</label>
+      <div class="input-group">
+        <input type="time" class="form-control" name="hora" required />
+      </div>
+    </div>
+
+    <!-- Botón -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-success px-4">Reservar turno</button>
+    </div>
+  </form>
+</div>
 {% endblock %}

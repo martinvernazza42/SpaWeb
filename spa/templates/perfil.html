@@ -1,7 +1,42 @@
 <!-- templates/perfil.html -->
-{% extends "base.html" %}
-
-{% block content %}
-<h1>Perfil</h1>
-<p>Aquí podrás ver y editar tu información personal.</p>
+{% extends "base.html" %} {% block content %}
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="min-height: 100vh"
+>
+  <div class="border p-4 rounded shadow-sm w-50 mx-auto">
+    <form>
+      <div class="mb-3 w-85">
+        <label for="exampleInputEmail1" class="form-label fs-4">Email</label>
+        <input
+          type="email"
+          class="form-control fs-5"
+          id="exampleInputEmail1"
+          aria-describedby="emailHelp"
+        />
+        <div id="emailHelp" class="form-text fs-6">
+          Nunca compartas tus datos con alguien más.
+        </div>
+      </div>
+      <div class="mb-3 w-85">
+        <label for="exampleInputPassword1" class="form-label fs-4"
+          >Contraseña</label
+        >
+        <input
+          type="password"
+          class="form-control fs-5"
+          id="exampleInputPassword1"
+        />
+      </div>
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="exampleCheck1" />
+        <label class="form-check-label fs-5" for="exampleCheck1"
+          >Olvide mi contraseña</label
+        >
+      </div>
+      <button type="button" class="btn btn-light fs-5">Registrarse</button>
+      <button type="submit" class="btn btn-primary fs-5">Ingresar</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

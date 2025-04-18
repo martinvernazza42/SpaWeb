@@ -1,17 +1,27 @@
 <!-- spa/templates/seleccionar_turno.html -->
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<div class="container my-5">
+  <h1 class="text-center fw-bold text-secondary mb-4">Seleccioná tu turno</h1>
 
-{% block content %}
-<h2>Seleccioná tu turno</h2>
-
-<form method="post">
+  <form method="post" class="mx-auto" style="max-width: 600px">
     {% csrf_token %}
-    <h3>Datos personales</h3>
-    {{ cliente_form.as_p }}
 
-    <h3>Servicio y turno</h3>
-    {{ turno_form.as_p }}
+    <!-- Datos personales -->
+    <div class="mb-4">
+      <h4 class="fw-bold text-primary mb-3">Datos personales</h4>
+      {{ cliente_form.as_p }}
+    </div>
 
-    <button type="submit">Reservar turno</button>
-</form>
+    <!-- Servicio y turno -->
+    <div class="mb-4">
+      <h4 class="fw-bold text-primary mb-3">Servicio y turno</h4>
+      {{ turno_form.as_p }}
+    </div>
+
+    <!-- Botón -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-success">Reservar turno</button>
+    </div>
+  </form>
+</div>
 {% endblock %}

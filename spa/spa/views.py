@@ -18,3 +18,12 @@ def perfil(request):
 
 def inicio(request):
     return render(request, 'base.html')
+
+def servicios_individuales(request):
+    return render(request, 'servicios_individuales.html')
+
+def servicios_grupales(request):
+    return render(request, 'servicios_grupales.html')
+
+def quienes_somos(request):
+    return render(request, 'quienes_somos.html')

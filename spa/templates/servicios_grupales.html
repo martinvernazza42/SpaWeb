@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container my-5">
+  <!-- Título principal de la página -->
+  <h1 class="text-center fw-bold text-secondary mb-4">
+    Nuestros Servicios Grupales
+  </h1>
+  <!-- Card de Hidromasajes -->
+  <div
+    class="card mb-5 shadow-sm"
+    style="max-width: 1300px; margin-left: auto; margin-right: auto"
+  >
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Hidromasajes</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen -->
+      <img
+        src="{% static 'hidromasajes.jpg' %}"
+        alt="Hidromasajes"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px"
+      />
+
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Hidromasajes</h5>
+        <p class="card-text">
+          Los hidromasajes combinan el poder del agua con técnicas de masaje
+          terapéutico. El flujo de agua y los jets de presión actúan sobre la
+          piel y los músculos, proporcionando una sensación de relajación y
+          bienestar. Es ideal para aliviar dolores musculares, mejorar la
+          circulación y reducir el estrés. Este tratamiento es perfecto para
+          grupos que buscan relajarse y disfrutar de los beneficios del agua
+          termal.
+        </p>
+        <a
+          href="{% url 'turnos' %}"
+          class="btn"
+          style="background-color: #d63384; color: white"
+          >Solicitar turno</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <!-- Card de Yoga -->
+  <div
+    class="card mb-5 shadow-sm"
+    style="max-width: 1300px; margin-left: auto; margin-right: auto"
+  >
+    <div class="card-header bg-light">
+      <h4 class="mb-0">Yoga</h4>
+    </div>
+    <div class="card-body d-flex flex-column flex-md-row">
+      <!-- Imagen -->
+      <img
+        src="{% static 'yoga.jpg' %}"
+        alt="Yoga"
+        class="img-fluid me-4 mb-3 mb-md-0"
+        style="max-width: 300px; max-height: 250px; border-radius: 10px"
+      />
+
+      <!-- Textos -->
+      <div>
+        <h5 class="fw-bold border-bottom pb-1">Yoga</h5>
+        <p class="card-text">
+          El yoga es una práctica que combina posturas físicas, respiración
+          controlada y meditación para mejorar la flexibilidad, la fuerza y la
+          concentración mental. Las clases grupales son ideales para quienes
+          buscan relajarse, mejorar su bienestar físico y emocional, y
+          fortalecer el cuerpo. Ofrecemos sesiones para todos los niveles, desde
+          principiantes hasta avanzados.
+        </p>
+        <a
+          href="{% url 'turnos' %}"
+          class="btn"
+          style="background-color: #d63384; color: white"
+          >Solicitar turno</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
