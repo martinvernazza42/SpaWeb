@@ -1,11 +1,11 @@
 import calendar
 from datetime import date as _date
-from django.shortcuts               import render, redirect, get_object_or_404
-from django.contrib                 import messages
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth           import views as auth_views
-from .forms                         import RegistroUsuarioForm
-from .models                        import Servicio, Disponibilidad, Turno, Cliente
+from django.contrib.auth import views as auth_views
+from .forms import RegistroUsuarioForm, ConsultaForm
+from .models import CategoriaServicio, Subcategoria, SubcategoriaServicio, Servicio, Disponibilidad, Turno, Cliente, Consulta
 
 def index(request):
     return render(request, 'index.html')
@@ -13,6 +13,9 @@ def index(request):
 def servicios(request):
     servicios = Servicio.objects.all()
     return render(request, 'servicios.html', {'servicios': servicios})
+
+def quienes_somos(request):
+    return render(request, 'quienes_somos.html')
 
 def consultas(request):
     return render(request, 'consultas.html')
@@ -102,7 +105,12 @@ logout_view = auth_views.LogoutView.as_view(next_page='login')
 
 @login_required
 def perfil(request):
-    return render(request, 'perfil.html')
+    turnos = Turno.objects.filter(cliente=request.user.cliente)
+    consultas = Consulta.objects.filter(email=request.user.email)
+    return render(request, 'perfil.html', {
+        'turnos': turnos,
+        'consultas': consultas
+    })
 
 @login_required
 def mis_turnos(request):
@@ -113,3 +121,13 @@ def mis_turnos(request):
     return render(request, 'mis_turnos.html', {
         'turnos': turnos
     })
+    
+def consultas(request):
+    if request.method == 'POST':
+        form = ConsultaForm(request.POST)
+        if form.is_valid():
+            form.save()  # Guarda la consulta
+            return render(request, 'consultas.html', {'form': form, 'mensaje': 'Consulta enviada exitosamente!'})
+    else:
+        form = ConsultaForm()
+    return render(request, 'consultas.html', {'form': form})

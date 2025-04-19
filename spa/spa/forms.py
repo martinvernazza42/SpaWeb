@@ -1,18 +1,21 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Cliente, Turno
+from .models import Cliente, Turno, Consulta
 
+# Formulario para Cliente
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = ['telefono']
 
+# Formulario para Turno
 class TurnoForm(forms.ModelForm):
     class Meta:
         model = Turno
         fields = ['servicio', 'fecha', 'hora']
 
+# Formulario de Registro de Usuario
 class RegistroUsuarioForm(UserCreationForm):
     email      = forms.EmailField(required=True)
     first_name = forms.CharField(label='Nombre', max_length=100, required=True)
@@ -37,8 +40,17 @@ class RegistroUsuarioForm(UserCreationForm):
         user.last_name  = self.cleaned_data['last_name']
         if commit:
             user.save()
+            # Crear Cliente asociado al usuario
             Cliente.objects.create(
                 user     = user,
                 telefono = self.cleaned_data.get('telefono', '')
             )
         return user
+
+# Formulario de Consulta
+class ConsultaForm(forms.ModelForm):
+    class Meta:
+        model = Consulta
+        fields = ['nombre', 'mensaje']  # Solo los campos necesarios (sin 'servicio')
+
+    # Si deseas agregar validaciones adicionales o personalizar más los campos, puedes hacerlo aquí.

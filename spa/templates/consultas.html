@@ -1,7 +1,36 @@
-<!-- templates/consultas.html -->
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<h1>Consultas</h1>
-<p>Podés enviarnos tus preguntas y te responderemos a la brevedad.</p>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-light">
+                    <div class="card-header text-center bg-pink text-white">
+                        <h3 class="text-black">Consulta</h3> <!-- Cambio de color a negro -->
+                        <p class="text-black">¡Estamos aquí para ayudarte! Completa el formulario y nos pondremos en contacto contigo.</p> <!-- Cambio de color a negro -->
+                    </div>
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Tu correo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="mensaje" class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="mensaje" name="mensaje" rows="4" placeholder="Escribe tu consulta aquí" required></textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-pink">Enviar consulta</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -3,6 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('consultas/', views.consultas, name='consultas'),
+    
     # Admin
     path('admin/', admin.site.urls),
 
@@ -21,7 +23,7 @@ urlpatterns = [
         views.reservar_por_fecha,
         name='reservar_por_fecha'
     ),
-
+    path('quienes-somos/', views.quienes_somos, name='quienes_somos'), 
       path(
         'turno/<int:turno_id>/confirmacion/',
         views.reserva_exitosa,

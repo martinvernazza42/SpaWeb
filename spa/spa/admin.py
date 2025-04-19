@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Servicio, Disponibilidad, Turno
+from .models import CategoriaServicio, SubcategoriaServicio, Servicio, Cliente, Turno, Disponibilidad, Consulta
 
 class DisponibilidadInline(admin.TabularInline):
     model = Disponibilidad
@@ -24,3 +24,36 @@ class TurnoAdmin(admin.ModelAdmin):
     list_display  = ('cliente', 'servicio', 'fecha', 'hora')
     list_filter   = ('servicio', 'fecha')
     search_fields = ('cliente__nombre', 'servicio__nombre')
+
+# Registra los modelos adicionales
+@admin.register(CategoriaServicio)
+class CategoriaServicioAdmin(admin.ModelAdmin):
+    list_display = ('nombre',)
+
+@admin.register(SubcategoriaServicio)
+class SubcategoriaServicioAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'categoria')
+
+@admin.register(Cliente)
+class ClienteAdmin(admin.ModelAdmin):
+    list_display = ('user', 'telefono')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name')
+
+from .models import Consulta, Subcategoria
+
+class ConsultaAdmin(admin.ModelAdmin):
+    # Método que obtiene el correo del cliente relacionado con la consulta
+    def cliente_email(self, obj):
+        # Verifica si hay un cliente asociado y devuelve su email
+        if obj.servicio:  # Solo si hay un servicio relacionado
+            return obj.servicio.cliente.user.email
+        return "Sin cliente"
+    
+    # Agregar el método 'cliente_email' al list_display
+    cliente_email.admin_order_field = 'cliente__email'  # Permite ordenar por el email en la vista de admin
+    cliente_email.short_description = 'Email del Cliente'  # Título de la columna en la interfaz admin
+    
+    list_display = ['nombre', 'cliente_email', 'mensaje']  # Ajusta la lista de campos para mostrar en la vista admin
+
+# Registrar el modelo Consulta con la clase admin personalizada
+admin.site.register(Consulta, ConsultaAdmin)

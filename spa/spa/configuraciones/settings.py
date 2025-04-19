@@ -128,5 +128,9 @@ STATICFILES_DIRS = (os.path.join(os.path. dirname(BASE_DIR),'static'),)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = '/media/' 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'media')
+import os
+
+# Para la carga de archivos media (imágenes, etc.)
+
+MEDIA_URL = '/media/'  # URL para acceder a los archivos cargados
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ruta del directorio donde se guardarán los archivos
