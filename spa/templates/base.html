@@ -105,7 +105,6 @@
       height: 50px;
     }
 
-    /* Hover “pop” para celdas de calendario */
     .table tbody td {
       transition: transform 0.15s ease-in-out;
       position: relative;
@@ -115,7 +114,6 @@
       z-index: 1;
     }
 
-    /* Resto de tus estilos… */
     .white-section {
       background-color: white;
       color: black;
@@ -196,19 +194,22 @@
     <nav id="navbar">
       <div>
         <a href="{% url 'inicio' %}">
-          <img src="{% static 'logo-spa.png' %}" class="navbar-logo">
+          <img src="{% static 'logo-spa.png' %}" class="navbar-logo" alt="Logo">
         </a>
       </div>
       <div>
         <a href="{% url 'servicios' %}">Servicios</a>
-        <a href="{% url 'mis_turnos' %}">Mis turnos</a>
         <a href="{% url 'consultas' %}">Consultas</a>
         <a href="{% url 'quienes_somos' %}">Quiénes somos</a>
-        <a href="{% url 'perfil' %}">Perfil</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'mis_turnos' %}">Mis turnos</a>
+          <a href="{% url 'perfil' %}">Perfil</a>
+        {% else %}
+          <a href="{% url 'login' %}">Iniciar sesión</a>
+        {% endif %}
       </div>
     </nav>
 
-    {# Mensajes flash de Django #}
     {% if messages %}
       <div class="container mt-3">
         {% for m in messages %}
@@ -218,26 +219,26 @@
     {% endif %}
 
     {% block banner_content %}
-    <div class="text-center-custom">
-      <h1 class="display-4 fw-bold">Porque sentirse bien...</h1>
-      <p class="lead dynamic-phrase show" id="changingPhrase">es una elección diaria.</p>
-      <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
-    </div>
+      <div class="text-center-custom">
+        <h1 class="display-4 fw-bold">Porque sentirse bien...</h1>
+        <p class="lead dynamic-phrase show" id="changingPhrase">es una elección diaria.</p>
+        <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
+      </div>
     {% endblock %}
   </div>
 
   {% block content %}
-  <div class="white-section text-center">
-    <h2>Tu bienestar comienza con nosotros</h2>
-    <div class="container mt-5 text-center">
-      <p>Es una verdad universal: nuestro bienestar influye profundamente en cómo nos conectamos con el mundo, con los demás y con nosotros mismos.</p>
-      <p>Por eso creamos una experiencia que apela a todos tus sentidos. En Sentirse Bien Spa, cada detalle, cada tratamiento y cada espacio están diseñados con un único objetivo en mente: ofrecerte una relajación excepcional.</p>
-      <p>Desde aromas suaves hasta sonidos armoniosos, te invitamos a dejar atrás el mundo y disfrutar de un momento de pura tranquilidad, en total armonía con la naturaleza.</p>
-      <p>Nuestra misión es simple: ofrecerte un refugio donde el autocuidado se convierta en una inversión esencial para tu bienestar.</p>
-      <p>Permítenos guiarte en un viaje de indulgencia sensorial, donde cada experiencia está pensada para desconectarte de la rutina diaria y reconectarte con tu paz interior.</p>
-      <a href="{% url 'turnos' %}" class="btn-pink">Reservar ahora</a>
+    <div class="white-section text-center">
+      <h2>Tu bienestar comienza con nosotros</h2>
+      <div class="container mt-5 text-center">
+        <p>Es una verdad universal: nuestro bienestar influye profundamente en cómo nos conectamos con el mundo, con los demás y con nosotros mismos.</p>
+        <p>Por eso creamos una experiencia que apela a todos tus sentidos. En Sentirse Bien Spa, cada detalle, cada tratamiento y cada espacio están diseñados con un único objetivo en mente: ofrecerte una relajación excepcional.</p>
+        <p>Desde aromas suaves hasta sonidos armoniosos, te invitamos a dejar atrás el mundo y disfrutar de un momento de pura tranquilidad, en total armonía con la naturaleza.</p>
+        <p>Nuestra misión es simple: ofrecerte un refugio donde el autocuidado se convierta en una inversión esencial para tu bienestar.</p>
+        <p>Permítenos guiarte en un viaje de indulgencia sensorial, donde cada experiencia está pensada para desconectarte de la rutina diaria y reconectarte con tu paz interior.</p>
+        <a href="{% url 'turnos' %}" class="btn-pink">Reservar ahora</a>
+      </div>
     </div>
-  </div>
   {% endblock %}
 
   <script>
@@ -299,6 +300,5 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  
 </body>
 </html>

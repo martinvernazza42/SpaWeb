@@ -1,56 +1,53 @@
 from django.contrib import admin
 from django.urls import path
-from . import views
-from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.static import static
+
+from . import views
 
 urlpatterns = [
-    path('consultas/', views.consultas, name='consultas'),
-    
-    # Admin
-    path('admin/', admin.site.urls),
-
-    # Inicio y secciones
+    # Secciones generales
     path('', views.index, name='inicio'),
     path('servicios/', views.servicios, name='servicios'),
+    path('servicios/<int:servicio_id>/calendario/', views.calendario_servicio, name='calendario_servicio'),
     path(
-        'servicios/<int:servicio_id>/calendario/',
-        views.calendario_servicio,
-        name='calendario_servicio'
-    ),
-    # Ruta para reservar un día concreto
-    path(
-        'servicios/<int:servicio_id>/calendario/'
-        '<int:year>/<int:month>/<int:day>/reservar/',
+        'servicios/<int:servicio_id>/calendario/<int:year>/<int:month>/<int:day>/reservar/',
         views.reservar_por_fecha,
         name='reservar_por_fecha'
     ),
-    path('quienes-somos/', views.quienes_somos, name='quienes_somos'), 
-      path(
-        'turno/<int:turno_id>/confirmacion/',
-        views.reserva_exitosa,
-        name='reserva_exitosa'
-    ),
-
+    path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
+    path('turnos/', views.turnos, name='turnos'),
     path('consultas/', views.consultas, name='consultas'),
-    path('turnos/',    views.turnos,    name='turnos'),
 
-    # Auth
+    # Reserva
+    path('turno/<int:turno_id>/confirmacion/', views.reserva_exitosa, name='reserva_exitosa'),
+
+    # Administración de turnos (solo staff)
+    path('admin/servicios/<int:servicio_id>/turnos/',
+         views.admin_lista_turnos,
+         name='admin_lista_turnos'),
+    path('admin/servicios/<int:servicio_id>/turnos/nuevo/',
+         views.admin_editar_turno,
+         name='admin_crear_turno'),
+    path('admin/turnos/<int:turno_id>/editar/',
+         views.admin_editar_turno,
+         name='admin_editar_turno'),
+    path('admin/turnos/<int:turno_id>/eliminar/',
+         views.admin_eliminar_turno,
+         name='admin_eliminar_turno'),
+
+    # Django admin
+    path('admin/', admin.site.urls),
+
+    # Autenticación
     path('registro/', views.registro, name='registro'),
-    path('login/',    views.login_view,  name='login'),
-    path('logout/',   views.logout_view, name='logout'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 
-    path(
-      'mis-turnos/',
-      views.mis_turnos,
-      name='mis_turnos'
-    ),
-
-    # Perfil
-    path('perfil/',   views.perfil,    name='perfil'),
-    
-    #Carga de foto en servicios
-    
+    # Perfil de usuario
+    path('perfil/', views.perfil, name='perfil'),
+    path('mis-turnos/', views.mis_turnos, name='mis_turnos'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

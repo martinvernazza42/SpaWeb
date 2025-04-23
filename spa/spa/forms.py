@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Cliente, Turno, Consulta
+from .models import Cliente, Turno, Consulta, Disponibilidad
 
 # Formulario para Cliente
 class ClienteForm(forms.ModelForm):
@@ -54,3 +54,19 @@ class ConsultaForm(forms.ModelForm):
         fields = ['nombre', 'mensaje']  # Solo los campos necesarios (sin 'servicio')
 
     # Si deseas agregar validaciones adicionales o personalizar más los campos, puedes hacerlo aquí.
+
+
+class DisponibilidadForm(forms.ModelForm):
+    class Meta:
+        model = Disponibilidad
+        fields = [
+            'servicio',
+            'fecha',
+            'hora_inicio',
+            'hora_fin',
+        ]
+        widgets = {
+            'fecha':       forms.DateInput(attrs={'type': 'date'}),
+            'hora_inicio': forms.TimeInput(attrs={'type': 'time'}),
+            'hora_fin':    forms.TimeInput(attrs={'type': 'time'}),
+        }
