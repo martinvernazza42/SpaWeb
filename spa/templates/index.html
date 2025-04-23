@@ -1,31 +1,142 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
-{% block banner_content %}
-  <div class="d-flex flex-column align-items-center justify-content-center text-white text-center" style="flex: 1; z-index: 2;">
-    <h1 class="display-4 fw-bold">Bienvenido al Spa Bienestar</h1>
-    <p class="lead">Disfrutá de nuestros servicios pensados para tu relajación y bienestar.</p>
-  </div>
-{% endblock %}
+{% block title %}Spa Sentirse Bien - Inicio{% endblock %}
 
 {% block content %}
-  <div class="white-section text-center">
-    <h2>¿Quiénes somos?</h2>
-    <p>Con profesionales certificados y terapias naturales, tu bienestar está en buenas manos.</p>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <section id="hero" class="py-5 bg-light text-center">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-6">
+                    <div class="hero-content">
+                      <h1 style="color: #e65c9d;">Bienvenido al Spa</h1>
+                        <p class="lead text-secondary text-center">Disfrutá de nuestros servicios pensados para tu relajación y bienestar.</p> <!-- Centrado -->
+                        <a href="#servicios" class="btn btn-lg" style="background-color: #f1a7c4; border-color: #e65c9d; color: white;">Descubre nuestros servicios</a>
 
-    <div class="container mt-5 text-start">
-      <h3>Nuestros servicios incluyen:</h3>
-      <p>
-        Солнце медленно поднималось над горизонтом, окрашивая волжскую гладь в мягкие оттенки золота. Река текла спокойно, как будто не замечая смены времен, как и люди, жившие вдоль её берегов, веками наблюдали одни и те же рассветы. Городок Сторожево, стоявший на правом берегу, словно вырезанный из старой открытки: деревянные дома с резными наличниками, старинная церковь с облупившейся позолотой на куполах, и центральная улица, вымощенная булыжником.
-        Александр Петрович, бывший учитель истории, проснулся как обычно в пять утра. Его жизнь давно вошла в ритм, не нарушаемый ни бурями, ни праздниками. Он надел старую куртку, прихватил кружку и вышел на крыльцо. Тишина. Только далёкий гудок баржи и редкое карканье ворон над колокольней. Он налил себе чай и сел на лавочку, вглядываясь в дымку, стелющуюся над рекой.
-        В его жизни было много — и война, и любовь, и предательство, и гордость за учеников, которые уехали далеко за пределы Сторожева. Он не жаловался: деревья не жалуются на ветер, они просто гнутся. Так и он — сгибался под жизнью, но не ломался.
-        Иногда к нему приходила Марья Сергеевна, библиотекарь на пенсии. Она приносила свежие газеты и книги, о которых они потом спорили на кухне за самоваром. Их разговоры были словно утренний туман — тихие, плавные, полные смысла, который не всегда был явным. «А ведь мы были молодыми», — иногда говорила она, и в глазах её вспыхивал свет, похожий на отблеск заката в окне вагона.
-        Дети во дворе гоняли мяч, и их радостные крики нарушали сонную тишину улицы. Жизнь в городе текла медленно, но устойчиво. Каждый знал каждого, и всё было предсказуемо, как смена времен года. Но именно в этом предсказуемом ритме заключалась странная гармония.
-        Однажды в город приехал незнакомец. Высокий, в длинном плаще, с чемоданом в руках. Он остановился в старом доме купца Агафонова, который давно стоял пустым. Люди начали строить догадки: кто он? Что ему нужно здесь, где даже время замедляет шаг?
-        Александр Петрович встретил его на набережной. Незнакомец, представившийся Ильёй, оказался писателем. «Я ищу вдохновение», — сказал он, глядя на гладь реки. — «Мне кажется, здесь оно спрятано в каждом камне». Александр кивнул. Он знал: вдохновение не живёт в шуме — оно прячется в тишине, в памяти, в недосказанных словах.
-        Так началась новая глава жизни Сторожева. Писатель поселился надолго, стал общаться с жителями, записывать их рассказы. Он слушал, как старики говорили о войне, как молодёжь мечтала уехать, как женщины вспоминали былую любовь, а дети рисовали на асфальте мелом небо, солнце и дома.
-        Скоро появилась идея — издать книгу о городе. Сторожево заговорил иначе. Люди начали замечать красоту в обычных вещах: в шелесте листвы, в запахе печёного хлеба, в смехе, раздающемся из окна школы. Они чувствовали, что их истории важны. И даже те, кто раньше считал свою жизнь серой, вдруг увидели в ней смысл.
-      </p>
-    </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="hero-image">
+                      <img src="{% static 'imagen-hero.jpg' %}" alt="Ambiente relajante del spa" class="img-fluid rounded shadow-sm">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicios" class="py-5 bg-light">
+      <div class="container">
+        <h2 class="text-center mb-4" style="color: #e65c9d;">Nuestros Servicios</h2>
+          <div class="row">
+              <div class="col-md-6">
+                  <div class="servicios-descripcion">
+                      <h3 class="text-secondary">Servicios Individuales o Masajes:</h3>
+                      <ul class="text-muted">
+                          <li>Anti-stress</li>
+                          <li>Descontracturantes</li>
+                          <li>Masajes con piedras calientes</li>
+                          <li>Circulatorios</li>
+                      </ul>
+  
+                      <h3 class="text-secondary">Belleza:</h3>
+                      <ul class="text-muted">
+                          <li>Lifting de pestaña</li>
+                          <li>Depilación facial</li>
+                          <li>Belleza de manos y pies</li>
+                      </ul>
+  
+                      <h3 class="text-secondary">Tratamientos Faciales:</h3>
+                      <ul class="text-muted">
+                          <li>Punta de Diamante: Microexfoliación</li>
+                          <li>Limpieza profunda + Hidratación</li>
+                          <li>Criofrecuencia facial: produce el “SHOCK TÉRMICO” logrando resultados instantáneos de efecto lifting</li>
+                      </ul>
+  
+                      <h3 class="text-secondary">Tratamientos Corporales:</h3>
+                      <ul class="text-muted">
+                          <li>VelaSlim: Reducción de la circunferencia corporal y la celulitis</li>
+                          <li>DermoHealth: moviliza los distintos tejidos de la piel y estimula la microcirculación, generando un drenaje linfático</li>
+                          <li>Criofrecuencia: produce un efecto de lifting instantáneo</li>
+                          <li>Ultracavitación: Técnica reductora</li>
+                      </ul>
+  
+                      <h3 class="text-secondary">Servicios Grupales:</h3>
+                      <ul class="text-muted">
+                          <li>Hidromasajes</li>
+                          <li>Yoga</li>
+                      </ul>
+                  </div>
+              </div>
+              <div class="col-md-6 text-center">
+                  <div class="cta-servicios">
+                    <p class="lead" style="color: #e65c9d;">Descubre la variedad de tratamientos que tenemos para ti.</p>
+                      <!-- Aquí está el botón con la URL correcta -->
+                      <a href="{% url 'servicios' %}" class="btn btn-outline-rosa btn-lg" style="color: #e65c9d; border-color: #e65c9d;">Ver todos los servicios</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </section>
+  
+    <section id="instalaciones" class="py-5">
+        <div class="container">
+          <h2 class="text-center mb-4" style="color: #e65c9d;">Nuestras Instalaciones</h2>
+            <p class="lead text-secondary text-center mb-4">Sumérgete en un ambiente de paz y confort diseñado para tu bienestar.</p>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <img src="{% static 'instalacion1.jpg' %}" alt="Sala de masajes" class="img-fluid rounded shadow-sm">
+                </div>
+                <div class="col">
+                    <img src="{% static 'instalacion3.jpg' %}" alt="Área de relajación" class="img-fluid rounded shadow-sm">
+                </div>
+                <div class="col">
+                    <img src="{% static 'instalacion2.jpg' %}" alt="Cabina de tratamiento" class="img-fluid rounded shadow-sm">
+                </div>
+            </div>
+            <p class="text-muted text-center mt-3">Salas climatizadas, tecnología de vanguardia, aromaterapia y música ambiental te esperan.</p>
+        </div>
+    </section>
+
+    <section id="ubicacion" class="py-5">
+        <div class="container">
+          <h2 class="text-center mb-4" style="color: #e65c9d;">Ubicación</h2>
+            <p class="lead text-secondary text-center mb-4">Encuentra nuestro oasis de tranquilidad en:</p>
+            <div class="mapa">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.48777777777!2d-58.98888888888889!3d-27.45555555555555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x944574444444444%3A0x8888888888888888!2sFrench+414,+Resistencia,+Chaco!5e0!3m2!1ses!2sar!4v[fecha]" width="80%" height="400" style="border:0; display: block; margin: 0 auto;" allowfullscreen="" loading="lazy" class="rounded shadow-sm"></iframe>
+            </div>
+            <p class="text-muted text-center mt-3">Dirección: French 414, Resistencia, Chaco.</p>
+        </div>
+    </section>
+
+    <div class="py-5 bg-light text-center">
+      <div class="container">
+          <p class="lead text-secondary mb-4">¿Tienes alguna pregunta? No dudes en contactarnos.</p>
+          <a href="{% url 'consultas' %}" class="btn btn-outline-rosa btn-lg shadow-lg rounded-pill px-4 py-3" style="color: #e65c9d; border-color: #e65c9d;">Haz tu consulta aquí</a>
+      </div>
   </div>
+
+    <section id="testimonios" class="py-5 bg-light">
+        <div class="container">
+          <h2 class="text-center mb-4" style="color: #e65c9d;">Testimonios de Nuestros Clientes</h2>
+            <div class="row row-cols-1 row-cols-md-2 g-4">
+                <div class="col">
+                    <div class="card p-3 border-0 shadow-sm rounded">
+                        <p class="text-muted fst-italic">"Una experiencia increíble. El ambiente es relajante y el personal muy profesional."</p>
+                        <p class="text-secondary">- María G.</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card p-3 border-0 shadow-sm rounded">
+                        <p class="text-muted fst-italic">"Desde que vengo a Spa Sentirse Bien, mi calidad de vida ha mejorado notablemente."</p>
+                        <p class="text-secondary">- Carlos P.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% include 'footer.html' %}
+
 {% endblock %}
+
