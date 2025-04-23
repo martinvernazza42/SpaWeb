@@ -42,18 +42,7 @@ class ClienteAdmin(admin.ModelAdmin):
 from .models import Consulta, Subcategoria
 
 class ConsultaAdmin(admin.ModelAdmin):
-    # Método que obtiene el correo del cliente relacionado con la consulta
-    def cliente_email(self, obj):
-        # Verifica si hay un cliente asociado y devuelve su email
-        if obj.servicio:  # Solo si hay un servicio relacionado
-            return obj.servicio.cliente.user.email
-        return "Sin cliente"
-    
-    # Agregar el método 'cliente_email' al list_display
-    cliente_email.admin_order_field = 'cliente__email'  # Permite ordenar por el email en la vista de admin
-    cliente_email.short_description = 'Email del Cliente'  # Título de la columna en la interfaz admin
-    
-    list_display = ['nombre', 'cliente_email', 'mensaje']  # Ajusta la lista de campos para mostrar en la vista admin
+    # Simplemente muestra los campos que ya están en el modelo
+    list_display = ['nombre', 'email', 'mensaje']  # Ajusta la lista de campos para mostrar en la vista admin
 
-# Registrar el modelo Consulta con la clase admin personalizada
 admin.site.register(Consulta, ConsultaAdmin)

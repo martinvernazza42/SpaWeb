@@ -34,7 +34,11 @@ class Subcategoria(models.Model):
 class Servicio(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
-    subcategoria = models.ForeignKey(Subcategoria, on_delete=models.CASCADE, null=True, blank=True)  # Permitir null
+    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.SET_NULL, null=True, blank=True)
+    imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # nuevo campo
+    def __str__(self):
+        return self.nombre
+
 
 
 class Cliente(models.Model):
@@ -67,13 +71,10 @@ class Disponibilidad(models.Model):
         return f"{self.servicio.nombre} – {self.fecha} {self.hora_inicio:%H:%M}"
 
 
-# El modelo Consulta
 class Consulta(models.Model):
     nombre = models.CharField(max_length=100)
-    email = models.EmailField(null=True, blank=True)
+    email = models.EmailField()  # Ahora obligatorio
     mensaje = models.TextField()
-    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True)
-    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)  # NUEVO
 
     def __str__(self):
         return self.nombre

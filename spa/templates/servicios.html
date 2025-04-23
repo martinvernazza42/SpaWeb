@@ -11,6 +11,9 @@
           <div class="card-body">
             <h5 class="card-title">{{ servicio.nombre }}</h5>
             <p class="card-text">{{ servicio.descripcion }}</p>
+            {% if servicio.imagen %}
+              <img src="{{ servicio.imagen.url }}" alt="{{ servicio.nombre }}" style="max-width: 300px;">
+            {% endif %}
           </div>
           <div class="card-footer bg-white text-end">
             <a href="{% url 'calendario_servicio' servicio.id %}"
