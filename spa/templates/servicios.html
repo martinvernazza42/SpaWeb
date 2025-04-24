@@ -1,7 +1,24 @@
 {% extends "base.html" %}
+
 {% block content %}
 <div class="container mt-5">
   <h2 class="mb-4">Servicios</h2>
+
+  <!-- Formulario de filtro por subcategoría -->
+  <form method="GET" class="mb-4">
+    <div class="form-group">
+      <label for="subcategoria">Filtrar por subcategoría</label>
+      <select name="subcategoria" id="subcategoria" class="form-control" onchange="this.form.submit()">
+        <option value="">Seleccionar subcategoría</option>
+        {% for subcategoria in subcategorias %}
+          <option value="{{ subcategoria.id }}" {% if request.GET.subcategoria == subcategoria.id %}selected{% endif %}>
+            {{ subcategoria.nombre }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
   <div class="row">
     {% for servicio in servicios %}
       <div class="col-md-4 mb-4">

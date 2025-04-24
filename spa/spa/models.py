@@ -1,13 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django import forms
-from django.shortcuts import render, redirect
 
 
-
-
-
-# NUEVOS MODELOS PARA CATEGORÍAS Y SUBCATEGORÍAS
+# MODELOS PARA CATEGORÍAS Y SUBCATEGORÍAS
 class CategoriaServicio(models.Model):
     nombre = models.CharField(max_length=100)
 
@@ -23,6 +18,7 @@ class SubcategoriaServicio(models.Model):
     def __str__(self):
         return f"{self.categoria.nombre} - {self.nombre}"
 
+
 class Subcategoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
@@ -30,15 +26,15 @@ class Subcategoria(models.Model):
     def __str__(self):
         return self.nombre
 
-# Modelo Servicio actualizado con Subcategoria
+
 class Servicio(models.Model):
-    nombre = models.CharField(max_length=200)
+    nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.SET_NULL, null=True, blank=True)
-    imagen = models.ImageField(upload_to='servicios/', null=True, blank=True)  # nuevo campo
+    imagen = models.ImageField(upload_to='servicios/', blank=True, null=True)
+    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.CASCADE)  # Relación de clave foránea
+
     def __str__(self):
         return self.nombre
-
 
 
 class Cliente(models.Model):
@@ -48,6 +44,7 @@ class Cliente(models.Model):
     def __str__(self):
         return self.user.get_full_name() or self.user.username
 
+
 class Turno(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
@@ -56,6 +53,7 @@ class Turno(models.Model):
 
     def __str__(self):
         return f"{self.cliente} - {self.servicio} - {self.fecha} {self.hora}"
+
 
 class Disponibilidad(models.Model):
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='disponibilidades')

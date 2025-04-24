@@ -210,13 +210,16 @@
       </div>
     </nav>
 
-    {% if messages %}
-      <div class="container mt-3">
-        {% for m in messages %}
-          <div class="alert alert-{{ m.tags }}">{{ m }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
+<!-- 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+-->
 
     {% block banner_content %}
       <div class="text-center-custom">

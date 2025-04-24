@@ -7,62 +7,79 @@ from django.contrib.auth import views as auth_views, logout
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .forms import RegistroUsuarioForm, ConsultaForm, DisponibilidadForm
-from .models import (
-    CategoriaServicio, Subcategoria, SubcategoriaServicio,
+from .models import ( SubcategoriaServicio,
     Servicio, Disponibilidad, Turno, Cliente, Consulta
 )
 
+# -------------------------------------------------------------------
+# Vistas Públicas
+# -------------------------------------------------------------------
 
 def index(request):
     return render(request, 'index.html')
 
 def servicios(request):
-    servicios = Servicio.objects.all()
-    return render(request, 'servicios.html', {'servicios': servicios})
+    subcategoria_id = request.GET.get('subcategoria')  # Obtener el parámetro 'subcategoria' de la URL
+    servicios = Servicio.objects.filter(subcategoria_id=subcategoria_id) if subcategoria_id else Servicio.objects.all()
+    subcategorias = SubcategoriaServicio.objects.all()
+    
+    return render(request, 'servicios.html', {
+        'servicios': servicios,
+        'subcategorias': subcategorias,
+    })
 
 def quienes_somos(request):
     return render(request, 'quienes_somos.html')
 
-def consultas(request):
-    if request.method == 'POST':
-        form = ConsultaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return render(request, 'consultas.html', {
-                'form': form,
-                'mensaje': 'Consulta enviada exitosamente!'
-            })
-    else:
-        form = ConsultaForm()
-    return render(request, 'consultas.html', {'form': form})
+from .models import Consulta  # Importación global, fuera de la función
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from .models import Consulta
+
+def consulta_view(request):
+    if request.method == "POST":
+        # Obtener datos del formulario
+        nombre = request.POST.get('nombre')
+        email = request.POST.get('email')
+        mensaje = request.POST.get('mensaje')
+
+        # Crear y guardar la consulta
+        consulta = Consulta(nombre=nombre, email=email, mensaje=mensaje)
+        consulta.save()
+
+        # Mostrar un mensaje de éxito
+        messages.success(request, 'Tu consulta ha sido enviada correctamente. ¡Gracias por contactarnos!')
+
+        # Redirigir al usuario de vuelta al formulario de consulta
+        return redirect('consultas')  # Redirige a la página con la URL 'consultas'
+
+    return render(request, 'consultas.html')
+
+
 
 def turnos(request):
     return render(request, 'turnos.html')
 
 def calendario_servicio(request, servicio_id):
     servicio = get_object_or_404(Servicio, pk=servicio_id)
-    hoy   = _date.today()
-    year  = int(request.GET.get('year',  hoy.year))
+    hoy = _date.today()
+    year = int(request.GET.get('year', hoy.year))
     month = int(request.GET.get('month', hoy.month))
 
     cal = calendar.Calendar(firstweekday=0)
     month_days = cal.monthdatescalendar(year, month)
-
-    qs = Disponibilidad.objects.filter(
-        servicio=servicio,
-        fecha__year=year,
-        fecha__month=month
-    )
+    qs = Disponibilidad.objects.filter(servicio=servicio, fecha__year=year, fecha__month=month)
     available = {d.fecha.day for d in qs}
     day_names = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
 
     return render(request, 'calendario_servicio.html', {
-        'servicio':   servicio,
-        'year':       year,
-        'month':      month,
+        'servicio': servicio,
+        'year': year,
+        'month': month,
         'month_days': month_days,
-        'available':  available,
-        'day_names':  day_names,
+        'available': available,
+        'day_names': day_names,
     })
 
 def reservar_por_fecha(request, servicio_id, year, month, day):
@@ -79,30 +96,19 @@ def reservar_por_fecha(request, servicio_id, year, month, day):
         slot_id = request.POST.get('slot_id')
         slot = get_object_or_404(Disponibilidad, pk=slot_id)
 
-        turno = Turno.objects.create(
-            cliente  = cliente,
-            servicio = servicio,
-            fecha    = fecha_obj,
-            hora     = slot.hora_inicio
-        )
+        turno = Turno.objects.create(cliente=cliente, servicio=servicio, fecha=fecha_obj, hora=slot.hora_inicio)
         return redirect('reserva_exitosa', turno_id=turno.id)
 
     return render(request, 'reservar_por_fecha.html', {
         'servicio': servicio,
-        'day':       fecha_obj,
-        'slots':     slots,
+        'day': fecha_obj,
+        'slots': slots,
     })
 
 @login_required
 def reserva_exitosa(request, turno_id):
-    turno = get_object_or_404(
-        Turno,
-        pk=turno_id,
-        cliente__user=request.user
-    )
-    return render(request, 'reserva_exitosa.html', {
-        'turno': turno
-    })
+    turno = get_object_or_404(Turno, pk=turno_id, cliente__user=request.user)
+    return render(request, 'reserva_exitosa.html', {'turno': turno})
 
 def registro(request):
     if request.method == 'POST':
@@ -113,7 +119,12 @@ def registro(request):
             return redirect('login')
     else:
         form = RegistroUsuarioForm()
+    
     return render(request, 'registro.html', {'form': form})
+
+# ---------------------------------------------------------------
+# Vistas de Autenticación
+# ---------------------------------------------------------------
 
 # *** logout_view que acepta GET y redirige a login ***
 from django.contrib.auth import logout as auth_logout
@@ -125,25 +136,28 @@ def logout_view(request):
 # Login usando la vista genérica
 login_view = auth_views.LoginView.as_view(template_name='login.html')
 
+# ---------------------------------------------------------------
+# Vistas de Perfil
+# ---------------------------------------------------------------
+
 @login_required
 def perfil(request):
     turnos = Turno.objects.filter(cliente=request.user.cliente)
     consultas = Consulta.objects.filter(email=request.user.email)
+    
     return render(request, 'perfil.html', {
-        'turnos':    turnos,
+        'turnos': turnos,
         'consultas': consultas
     })
 
-@login_required
+#@login_required
 def mis_turnos(request):
     cliente = get_object_or_404(Cliente, user=request.user)
     turnos = Turno.objects.filter(cliente=cliente).order_by('fecha', 'hora')
-    return render(request, 'mis_turnos.html', {
-        'turnos': turnos
-    })
+    return render(request, 'mis_turnos.html', {'turnos': turnos})
 
 # -------------------------------------------------------------------
-# Vistas de administración para gestión de turnos
+# Vistas de Administración
 # -------------------------------------------------------------------
 
 @staff_member_required
@@ -152,7 +166,7 @@ def admin_lista_turnos(request, servicio_id):
     turnos = Disponibilidad.objects.filter(servicio=servicio)
     return render(request, 'admin/servicio_turnos.html', {
         'servicio': servicio,
-        'turnos':    turnos
+        'turnos': turnos
     })
 
 @staff_member_required
@@ -162,6 +176,7 @@ def admin_editar_turno(request, servicio_id=None, turno_id=None):
         servicio_id = turno.servicio.id
     else:
         turno = Disponibilidad(servicio_id=servicio_id)
+
     if request.method == 'POST':
         form = DisponibilidadForm(request.POST, instance=turno)
         if form.is_valid():
@@ -169,10 +184,11 @@ def admin_editar_turno(request, servicio_id=None, turno_id=None):
             return redirect('admin_lista_turnos', servicio_id=servicio_id)
     else:
         form = DisponibilidadForm(instance=turno)
+
     return render(request, 'admin/editar_turno.html', {
-        'form':        form,
+        'form': form,
         'servicio_id': servicio_id,
-        'nuevo':       turno_id is None
+        'nuevo': turno_id is None
     })
 
 @staff_member_required

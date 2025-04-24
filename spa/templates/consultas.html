@@ -10,6 +10,18 @@
                         <p class="text-black">¡Estamos aquí para ayudarte! Completa el formulario y nos pondremos en contacto contigo.</p> <!-- Cambio de color a negro -->
                     </div>
                     <div class="card-body">
+                        <!-- Mostrar mensajes de éxito -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'success' %}
+                                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                        <strong>{{ message }}</strong>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                        
                         <form method="post">
                             {% csrf_token %}
                             <div class="mb-3">

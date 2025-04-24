@@ -17,7 +17,8 @@ urlpatterns = [
     ),
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
     path('turnos/', views.turnos, name='turnos'),
-    path('consultas/', views.consultas, name='consultas'),
+    path('consultas/', views.consulta_view, name='consultas'),
+   
 
     # Reserva
     path('turno/<int:turno_id>/confirmacion/', views.reserva_exitosa, name='reserva_exitosa'),
