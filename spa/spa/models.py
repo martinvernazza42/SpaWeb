@@ -1,65 +1,49 @@
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import User
-from django.conf import settings
 
-# Clase Categoría
-class Categoria(models.Model):
-    nombre = models.CharField(max_length=30)
+
+# MODELOS PARA CATEGORÍAS Y SUBCATEGORÍAS
+class CategoriaServicio(models.Model):
+    nombre = models.CharField(max_length=100)
 
     def __str__(self):
         return self.nombre
 
-# Clase Posts
-class Posts(models.Model):
-    titulo = models.CharField(max_length=50)
-    subtitulo = models.CharField(max_length=100, null=True, blank=True)
-    fecha = models.DateTimeField(auto_now_add=True)
-    autor = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    texto = models.TextField()
-    activo = models.BooleanField(default=True)
-    categoria = models.ForeignKey (Categoria, on_delete= models.SET_NULL, null=True, default='Sin categoría' )  # Ya no es nullable ni tiene default incorrecto
-    imagen = models.ImageField(null=True, blank=True, upload_to='media', default='static/post_default.png')
-    publicado = models.DateField(default=timezone.now)
 
-    class Meta:
-        ordering = ('-publicado',)
+class SubcategoriaServicio(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)  # Este es el nuevo campo
+    categoria = models.ForeignKey(CategoriaServicio, on_delete=models.CASCADE, related_name='subcategorias')
 
     def __str__(self):
-        return self.titulo
+        return f"{self.categoria.nombre} - {self.nombre}"
 
-    def delete(self, using=None, keep_parents=False):
-        self.imagen.delete(self.imagen.name)
-        super().delete()
 
-# Clase Comentario
-class Comentario(models.Model):
-    posts = models.ForeignKey('Posts', on_delete=models.CASCADE, related_name='comentarios')
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='comentarios')
-    texto = models.TextField()
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.texto
-
-# spa/models.py
-from django.db import models
-
-class Servicio(models.Model):
+class Subcategoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
 
     def __str__(self):
         return self.nombre
 
-class Cliente(models.Model):
+
+class Servicio(models.Model):
     nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    email = models.EmailField()
-    telefono = models.CharField(max_length=20)
+    descripcion = models.TextField()
+    imagen = models.ImageField(upload_to='servicios/', blank=True, null=True)
+    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.CASCADE)  # Relación de clave foránea
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return self.nombre
+
+
+class Cliente(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    telefono = models.CharField(max_length=20, blank=True)
+
+    def __str__(self):
+        return self.user.get_full_name() or self.user.username
+
 
 class Turno(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
@@ -71,7 +55,24 @@ class Turno(models.Model):
         return f"{self.cliente} - {self.servicio} - {self.fecha} {self.hora}"
 
 
+class Disponibilidad(models.Model):
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='disponibilidades')
+    fecha = models.DateField()
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+
+    class Meta:
+        unique_together = ('servicio', 'fecha', 'hora_inicio')
+        ordering = ['fecha', 'hora_inicio']
+
+    def __str__(self):
+        return f"{self.servicio.nombre} – {self.fecha} {self.hora_inicio:%H:%M}"
+
+
 class Consulta(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+    email = models.EmailField()  # Ahora obligatorio
     mensaje = models.TextField()
+
+    def __str__(self):
+        return self.nombre

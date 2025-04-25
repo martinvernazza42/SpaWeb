@@ -1,7 +1,264 @@
-<!-- templates/index.html -->
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %} Spa Sentirse Bien {% endblock %}
+{%block content %} {% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+<section id="hero" class="py-5 bg-light text-center">
+  <div class="container">
+    <div class="row justify-content-center align-items-center">
+      <div class="col-md-6">
+        <div class="hero-content">
+          <h1 style="color: #e65c9d">Bienvenido al Spa</h1>
+          <p class="lead text-secondary text-center">
+            "Es una verdad universal: Nuestro bienestar afecta profundamente
+            cómo nos conectamos con el mundo, con los demás y con nosotros
+            mismos. Por eso hemos creado un enfoque único del bienestar.
+          </p>
+          <p class="lead text-secondary text-center">
+            En Spa Sentirte Bien, cada detalle, espacio y experiencia ha sido
+            cuidadosamente elaborado con un único objetivo en mente: un cuidado
+            excepcional. Desde nuestros tratamientos más indulgentes hasta
+            nuestras sandalias de reflexología, cada parte de la experiencia en
+            "Sentirte Bien" está diseñada para ayudarte a sentirte de la mejor
+            manera, desde adentro hacia afuera.
+          </p>
+          <p class="lead text-secondary text-center">
+            Durante más de 20 años, nos hemos dedicado a nutrir el cuerpo y la
+            mente de nuestros huéspedes. Ahora es tu turno. Permítenos guiarte
+            en tu viaje personal de bienestar, donde el autocuidado se convierte
+            en una parte esencial de la inversión en tu bienestar total."
+          </p>
+          <!-- Centrado -->
+          <a
+            href="{% url 'servicios' %}"
+            class="btn btn-lg"
+            style="
+              background-color: #f1a7c4;
+              border-color: #e65c9d;
+              color: white;
+            "
+            >Descubre nuestros servicios</a
+          >
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="hero-image">
+          <img
+            src="{% static 'imagen-hero.jpg' %}"
+            alt="Ambiente relajante del spa"
+            class="img-fluid rounded shadow-sm"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container my-5 py-4" style="background-color: #f2f2f2">
+    <h2 class="text-center mb-4" style="color: #e65c9d">
+      Nuestras Instalaciones
+    </h2>
+    <div class="row justify-content-center">
+      <!-- Card 1 -->
+      <div class="col-md-4 mb-4 d-flex justify-content-center">
+        <div class="card" style="width: 22rem">
+          <img
+            src="{% static 'instalacion1.jpg' %}"
+            class="card-img-top"
+            alt="Camilla de Masaje"
+          />
+          <div class="card-body">
+            <h4 class="card-title" style="color: #e65c9d">Sala de Masaje</h4>
+            <p class="card-text text-muted">
+              En Spa Sentirse Bien, la experiencia del masaje trasciende lo
+              ordinario gracias a nuestra camilla de masaje de vanguardia: un
+              abrazo ergonómico inteligente que se adapta a ti, ofreciendo calor
+              envolvente y ajustes personalizados para una relajación profunda e
+              inmediata; deslízate en una superficie de confort inigualable,
+              donde la tecnología de punta se fusiona con un diseño elegante,
+              elevando cada tratamiento a un viaje sensorial personalizado que
+              libera tensiones y revitaliza cuerpo y mente, marcando el futuro
+              del bienestar que te espera hoy.
+            </p>
+          </div>
+        </div>
+      </div>
 
-{% block content %}
-<h1>Bienvenido al Spa Bienestar</h1>
-<p>Disfrutá de nuestros servicios pensados para tu relajación y bienestar.</p>
-{% endblock %}
+      <!-- Card 2 -->
+      <div class="col-md-4 mb-4 d-flex justify-content-center">
+        <div class="card" style="width: 22rem">
+          <img
+            src="{% static 'instalacion2.jpg' %}"
+            class="card-img-top"
+            alt="Sala grupal"
+          />
+          <div class="card-body">
+            <h4 class="card-title" style="color: #e65c9d">Sala grupal</h4>
+            <p class="card-text text-muted">
+              Adéntrate en nuestra versátil sala grupal, un espacio diseñado
+              para acompañarte en cada etapa de tu bienestar: desde la energía
+              revitalizante de una sesión de yoga matutina, fluyendo en armonía
+              con la luz natural y la serenidad del ambiente, hasta la calma
+              profunda que te envuelve tras la experiencia purificadora del
+              hidromasaje; aquí, la comodidad y la flexibilidad se unen para
+              ofrecerte un santuario de transición, donde puedes estirar tu
+              cuerpo, meditar en silencio o simplemente dejarte llevar por una
+              relajante quietud antes de regresar renovado al mundo exterior.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-md-4 mb-4 d-flex justify-content-center">
+        <div class="card" style="width: 22rem">
+          <img
+            src="{% static 'instalacion3.jpg' %}"
+            class="card-img-top"
+            alt="camilla tratamientos facial"
+          />
+          <div class="card-body">
+            <h4 class="card-title" style="color: #e65c9d">
+              Sala de tratamiento facial
+            </h4>
+            <p class="card-text text-muted">
+              Descubre nuestras salas de tratamiento facial, santuarios de
+              pureza y luminosidad meticulosamente diseñados para brindarte una
+              experiencia excepcional; la iluminación suave y estratégica realza
+              la serenidad del ambiente, mientras que la impecable limpieza
+              garantiza un espacio de confianza y bienestar absoluto; cada
+              detalle, desde la ergonomía de la camilla hasta la disposición de
+              los elementos, ha sido pensado para tu máxima comodidad,
+              permitiéndote relajarte profundamente mientras nuestros expertos
+              revitalizan tu piel con los tratamientos más avanzados.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="ubicacion" class="py-5" style="background-color: #fbc2db">
+    <div class="container text-white">
+      <h2 class="text-center mb-4" style="color: #ffffff">Ubicación</h2>
+      <p class="lead text-center mb-4">
+        Descubrí nuestro oasis de tranquilidad justo frente a la encantadora Plaza Belgrano.<br>
+        Un espacio de calma y bienestar en el corazón de la ciudad.
+      </p>
+      <div class="mapa">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3540.48777777777!2d-58.98888888888889!3d-27.45555555555555!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x944574444444444%3A0x8888888888888888!2sFrench+414,+Resistencia,+Chaco!5e0!3m2!1ses!2sar!4v[fecha]"
+          width="80%"
+          height="400"
+          style="border: 0; display: block; margin: 0 auto"
+          allowfullscreen=""
+          loading="lazy"
+          class="rounded shadow-sm"
+        ></iframe>
+      <!-- Cards de información --> 
+    <div class="row justify-content-center mt-5">
+
+    <div class="row justify-content-center">
+        <!-- Dirección -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-white text-dark text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Dirección</h5>
+              <p class="card-text">French 414,<br> Resistencia, Chaco</p>
+            </div>
+          </div>
+        </div>
+        <!-- Contacto -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-white text-dark text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Contacto</h5>
+              <p class="card-text">Tel: (362) 555-1234<br>Email: info@sentirsebien.com</p>
+            </div>
+          </div>
+        </div>
+        <!-- Horarios -->
+        <div class="col-md-3 mb-3">
+          <div class="card bg-white text-dark text-center shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Horarios</h5>
+              <p class="card-text">Lunes a Sábado<br>9:00 - 19:00</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="py-5 bg-light text-center">
+    <div class="container">
+      <p class="lead text-secondary mb-4">
+        ¿Tienes alguna pregunta? No dudes en contactarnos.
+      </p>
+      <a
+        href="{% url 'consultas' %}"
+        class="btn btn-outline-rosa btn-lg shadow-lg rounded-pill px-4 py-3"
+        style="color: #e65c9d; border-color: #e65c9d"
+        >Haz tu consulta aquí</a
+      >
+    </div>
+  </div>
+
+  <section id="testimonios" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center mb-4" style="color: #e65c9d">
+        Testimonios de Nuestros Clientes
+      </h2>
+      <div class="container">
+        <div class="row justify-content-center">
+          <!-- María -->
+          <div class="col-md-4 d-flex">
+            <div class="card shadow-sm p-3 bg-white rounded h-100 w-100">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'maria.png' %}" class="rounded-circle me-3" alt="Foto de María" width="60" height="60">
+                <div>
+                  <h6 class="mb-0">María González</h6>
+                  <small class="text-muted">Cliente feliz</small>
+                </div>
+              </div>
+              <p class="mb-0 text-secondary">
+                ¡Una experiencia maravillosa! Desde que entrás al spa te sentís renovada. El personal es súper profesional y atento.
+              </p>
+            </div>
+          </div>
+      
+          <!-- Sofía -->
+          <div class="col-md-4 d-flex">
+            <div class="card shadow-sm p-3 bg-white rounded h-100 w-100">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'sofia.png' %}" class="rounded-circle me-3" alt="Foto de Sofía" width="60" height="60">
+                <div>
+                  <h6 class="mb-0">Sofía Ramírez</h6>
+                  <small class="text-muted">Primera vez en el spa</small>
+                </div>
+              </div>
+              <p class="mb-0 text-secondary">
+                Me encantó el ambiente y la atención. Desde que entré me sentí mimada. ¡Definitivamente vuelvo!
+              </p>
+            </div>
+          </div>
+      
+          <!-- Lucas -->
+          <div class="col-md-4 d-flex">
+            <div class="card shadow-sm p-3 bg-white rounded h-100 w-100">
+              <div class="d-flex align-items-center mb-3">
+                <img src="{% static 'lucas.png' %}" class="rounded-circle me-3" alt="Foto de Lucas" width="60" height="60">
+                <div>
+                  <h6 class="mb-0">Lucas Fernández</h6>
+                  <small class="text-muted">Cliente habitual</small>
+                </div>
+              </div>
+              <p class="mb-0 text-secondary">
+                Siempre es un placer venir. Las instalaciones son impecables y salgo como nuevo cada vez. ¡Gracias!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% include 'footer.html' %} 
+  {% endblock %}
+</section>

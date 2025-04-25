@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Turnos de {{ servicio.nombre }}</h2>
+  <a href="{% url 'admin_crear_turno' servicio.id %}" class="btn btn-success mb-3">
+    Agregar turno
+  </a>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for turno in turnos %}
+      <tr>
+        <td>{{ turno.fecha }}</td>
+        <td>{{ turno.hora_inicio }} – {{ turno.hora_fin }}</td>
+        <td>
+          <a href="{% url 'admin_editar_turno' turno.id %}" class="btn btn-sm btn-primary">Editar</a>
+          <a href="{% url 'admin_eliminar_turno' turno.id %}" class="btn btn-sm btn-danger">Eliminar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

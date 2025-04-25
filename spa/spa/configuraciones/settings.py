@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'spa',
-    'apps.post',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +66,10 @@ TEMPLATES = [
         },
     },
 ]
+# Después de tu configuración de TEMPLATES, etc.
+
+LOGIN_REDIRECT_URL = '/perfil/'     # o el nombre de tu URL, p. ej. 'perfil'
+LOGOUT_REDIRECT_URL = '/login/'     # opcional: adónde ir tras logout
 
 WSGI_APPLICATION = 'spa.wsgi.application'
 
@@ -125,5 +128,9 @@ STATICFILES_DIRS = (os.path.join(os.path. dirname(BASE_DIR),'static'),)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MEDIA_URL = '/media/' 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR),'media')
+import os
+
+# Para la carga de archivos media (imágenes, etc.)
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

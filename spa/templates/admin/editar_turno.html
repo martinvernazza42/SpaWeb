@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2>{% if nuevo %}Agregar{% else %}Editar{% endif %} Turno</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary">{% if nuevo %}Crear{% else %}Guardar{% endif %}</button>
+    <a href="{% url 'admin_lista_turnos' servicio_id %}" class="btn btn-link">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

@@ -1,7 +1,84 @@
-<!-- templates/perfil.html -->
-{% extends "base.html" %}
+{% extends 'base.html' %} {% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-light mb-4">
+        <div class="card-header text-center bg-pink text-white">
+          <h3 class="text-black">Perfil del Usuario</h3>
+          <p class="text-black">
+            Consulta tu información personal registrada en el sistema.
+          </p>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Nombre:</strong> {{ user.first_name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Apellido:</strong> {{ user.last_name }}
+            </li>
+            <li class="list-group-item">
+              <strong>Nombre de usuario:</strong> {{ user.username }}
+            </li>
+            <li class="list-group-item">
+              <strong>Correo electrónico:</strong> {{ user.email }}
+            </li>
+            <li class="list-group-item">
+              <strong>Teléfono:</strong> {{ user.cliente.telefono }}
+            </li>
+          </ul>
+          <div class="d-grid gap-2 mt-4">
+            <a href="{% url 'logout' %}" class="btn btn-secondary"
+              >Cerrar sesión</a
+            >
+          </div>
+        </div>
+      </div>
 
-{% block content %}
-<h1>Perfil</h1>
-<p>Aquí podrás ver y editar tu información personal.</p>
-{% endblock %}
+      <!-- Turnos reservados -->
+      <div class="card shadow-sm border-light mb-4">
+        <div class="card-header bg-pink text-white">
+          <h5 class="text-black">Turnos reservados</h5>
+        </div>
+        <div class="card-body">
+          {% if turnos %}
+          <ul class="list-group">
+            {% for turno in turnos %}
+            <li class="list-group-item">
+              <strong>Servicio:</strong> {{ turno.servicio.nombre }}<br />
+              <strong>Fecha:</strong> {{ turno.fecha }}<br />
+              <strong>Hora:</strong> {{ turno.hora }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted">No tenés turnos reservados.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Consultas enviadas -->
+      <div class="card shadow-sm border-light">
+        <div class="card-header bg-pink text-white">
+          <h5 class="text-black">Consultas enviadas</h5>
+        </div>
+        <div class="card-body">
+          {% if consultas %}
+          <ul class="list-group">
+            {% for consulta in consultas %}
+            <li class="list-group-item">
+              <strong>Nombre:</strong> {{ consulta.nombre }}<br />
+              <strong>Email:</strong> {{ consulta.email }}<br />
+              <strong>Mensaje:</strong> {{ consulta.mensaje }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted">No enviaste consultas aún.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'footer.html' %} {% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container my-5">
+  <div class="row align-items-center">
+    <!-- Columna de texto -->
+    <div class="col-md-6">
+      <h2 class="mb-3">Conocé a la Dra. Felicidad</h2>
+      <p style="text-align: justify">
+        La <strong>Dra. Felicidad</strong>, fundadora de
+        <em>Spa Sentirse Bien</em>, ha dedicado más de 20 años a mejorar la
+        calidad de vida de sus pacientes. Su pasión por el bienestar integral la
+        llevó a formar un equipo de profesionales comprometidos con la salud
+        física, emocional y espiritual.
+      </p>
+      <p style="text-align: justify">
+        En cada sesión, la Dra. Felicidad y su equipo brindan una atención
+        cálida, personalizada y profesional. Ya sea a través de masajes
+        relajantes, terapias alternativas o tratamientos estéticos, el objetivo
+        es uno solo: que te sientas bien, por dentro y por fuera.
+      </p>
+      <p style="text-align: justify">
+        Nuestro spa cuenta con instalaciones modernas y cuidadosamente diseñadas
+        para brindarte una experiencia única desde el momento en que entrás.
+        Cada espacio está pensado para transmitir paz, armonía y confort.
+        Disponemos de salas climatizadas, cabinas de tratamiento equipadas con
+        tecnología de vanguardia, áreas de relajación con aromaterapia, música
+        ambiental y una decoración que invita al descanso.
+      </p>
+      <p style="text-align: justify">
+        Además, cumplimos con los más altos estándares de higiene y seguridad,
+        asegurando que cada visita sea no solo placentera, sino también
+        confiable. Vení a descubrir cómo el equilibrio entre lo natural y lo
+        tecnológico puede transformar tu bienestar.
+      </p>
+    </div>
+
+    <!-- Columna del carrusel -->
+    <div class="col-md-6">
+      <div
+        id="carouselExampleDark"
+        class="carousel carousel-dark slide"
+        data-bs-ride="carousel"
+      >
+        <div class="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#carouselExampleDark"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+            aria-label="Slide 1"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#carouselExampleDark"
+            data-bs-slide-to="1"
+            aria-label="Slide 2"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#carouselExampleDark"
+            data-bs-slide-to="2"
+            aria-label="Slide 3"
+          ></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active" data-bs-interval="5000">
+            <img
+              src="{% static 'spa1.jpg' %}"
+              class="d-block w-100"
+              style="height: 350px; object-fit: cover"
+              alt="Spa 1"
+            />
+          </div>
+          <div class="carousel-item" data-bs-interval="5000">
+            <img
+              src="{% static 'spa2.jpg' %}"
+              class="d-block w-100"
+              style="height: 350px; object-fit: cover"
+              alt="Spa 2"
+            />
+          </div>
+          <div class="carousel-item">
+            <img
+              src="{% static 'spa3.jpeg' %}"
+              class="d-block w-100"
+              style="height: 350px; object-fit: cover"
+              alt="Spa 3"
+            />
+          </div>
+        </div>
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleDark"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Anterior</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleDark"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Siguiente</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% include 'footer.html' %} {% endblock %}
