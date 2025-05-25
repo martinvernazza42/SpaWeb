@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block content %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
   <h2 class="mb-4">Mis Turnos</h2>
 
   {% if turnos %}
@@ -19,8 +19,5 @@
   <div class="alert alert-info">No tienes turnos reservados.</div>
   {% endif %}
 
-  <a href="{% url 'servicios' %}" class="btn btn-link mt-3">
-    &laquo; Volver a Servicios
-  </a>
 </div>
 {% include 'footer.html' %} {% endblock %}

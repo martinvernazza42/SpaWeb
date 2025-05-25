@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4 text-center">
+          <h4 class="mb-0">Pago del Turno</h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+
+            <!-- Tarjeta animada -->
+            <div class="col-md-6 mb-4 mb-md-0 d-flex align-items-center justify-content-center">
+              <div id="card-wrapper" style="width: 100%; max-width: 350px;"></div>
+            </div>
+
+            <!-- Formulario -->
+            <div class="col-md-6">
+              {% if anticipado %}
+                <div class="alert alert-info text-center">
+                  Pagando con <strong>tarjeta de débito</strong> 48 hs antes del turno, obtenés <strong>15% de descuento</strong>.
+                </div>
+              {% else %}
+                <div class="alert alert-warning text-center">
+                  El turno es dentro de las próximas 48 hs. Se aplica el precio de lista.
+                </div>
+              {% endif %}
+
+              <!-- Precios iniciales -->
+              <div class="text-center mb-4" id="precio-inicial">
+                <p class="mb-1">
+                  <strong>Precio base:</strong>
+                  <span class="text-muted">${{ precio_base|floatformat:"0" }}</span>
+                </p>
+                {% if anticipado %}
+                  <p>
+                    <strong>Con débito:</strong>
+                    <span class="text-success fw-bold">${{ precio_descuento|floatformat:"0" }}
+                      <small>(15% OFF)</small>
+                    </span>
+                  </p>
+                {% endif %}
+              </div>
+
+              <!-- Precio final dinámico -->
+              <div class="text-center mb-4 d-none" id="precio-final">
+                <p class="mb-0">
+                  <strong>Precio final:</strong>
+                  <span id="precio-final-monto" class="fw-bold text-dark"></span>
+                </p>
+              </div>
+
+              <form method="post" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                  <label for="metodo_pago" class="form-label">Método de Pago</label>
+                  <select class="form-select" name="metodo_pago" id="metodo_pago" required>
+                    <option value="">Seleccionar método</option>
+                    <option value="debito">Tarjeta de débito</option>
+                    <option value="credito">Tarjeta de crédito</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="nombre_tarjeta" class="form-label">Nombre en la tarjeta</label>
+                  <input type="text" class="form-control" id="nombre_tarjeta" name="nombre_tarjeta" required disabled>
+                </div>
+
+                <div class="mb-3">
+                  <label for="numero_tarjeta" class="form-label">Número de tarjeta</label>
+                  <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" maxlength="16" required disabled>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="vencimiento" class="form-label">Vencimiento (MM/AA)</label>
+                    <input type="text" class="form-control" id="vencimiento" name="vencimiento" placeholder="MM/AA" required disabled>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="codigo_seguridad" class="form-label">Código de seguridad</label>
+                    <input type="password" class="form-control" id="codigo_seguridad" name="codigo_seguridad" maxlength="4" required disabled>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mt-3">Pagar</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Card.js y jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/card.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/card.min.css" />
+
+<script>
+  new Card({
+    form: 'form',
+    container: '#card-wrapper',
+    formSelectors: {
+      numberInput: 'input[name="numero_tarjeta"]',
+      expiryInput: 'input[name="vencimiento"]',
+      cvcInput: 'input[name="codigo_seguridad"]',
+      nameInput: 'input[name="nombre_tarjeta"]'
+    },
+    width: 300,
+    formatting: true,
+    placeholders: {
+      number: '•••• •••• •••• ••••',
+      name: '',
+      expiry: '••/••',
+      cvc: '•••'
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const metodoSelect = document.getElementById("metodo_pago");
+    const campos = [
+      document.getElementById("nombre_tarjeta"),
+      document.getElementById("numero_tarjeta"),
+      document.getElementById("vencimiento"),
+      document.getElementById("codigo_seguridad")
+    ];
+
+    const precioFinalDiv = document.getElementById("precio-final");
+    const precioInicialDiv = document.getElementById("precio-inicial");
+    const precioFinalMonto = document.getElementById("precio-final-monto");
+
+    const precioBase = parseFloat("{{ precio_base|floatformat:'0' }}");
+    const precioDescuento = parseFloat("{{ precio_descuento|default_if_none:precio_base|floatformat:'0' }}");
+    const anticipado = "{{ anticipado|yesno:'true,false' }}" === "true";
+
+    metodoSelect.addEventListener("change", function () {
+      const metodo = this.value;
+
+      // Habilitar campos
+      campos.forEach(campo => campo.disabled = false);
+
+      // Mostrar precio final
+      if (anticipado && metodo === "debito") {
+        precioFinalMonto.textContent = "$" + precioDescuento;
+      } else {
+        precioFinalMonto.textContent = "$" + precioBase;
+      }
+
+      precioInicialDiv.classList.add("d-none");
+      precioFinalDiv.classList.remove("d-none");
+    });
+  });
+</script>
+{% endblock %}

@@ -1,22 +1,32 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container mt-5" style="max-width:600px;">
-  <div class="alert alert-success text-center">
-    <h3>¡Turno reservado con éxito!</h3>
-    <p><strong>Cliente:</strong>
-       {{ turno.cliente.user.get_full_name|default:turno.cliente.user.username }}
-    </p>
-    <p><strong>Servicio:</strong> {{ turno.servicio.nombre }}</p>
-    <p><strong>Fecha:</strong> {{ turno.fecha }}</p>
-    <p><strong>Hora:</strong> {{ turno.hora|time:"H:i" }}</p>
-  </div>
+{% extends 'base.html' %}
 
-  <div class="d-flex justify-content-center gap-3">
-    <a href="{% url 'mis_turnos' %}" class="btn btn-primary">Ver mis turnos</a>
-    </a>
-    <a href="{% url 'servicios' %}" class="btn btn-link">
-      Reservar otro
-    </a>
+{% block content %}
+<div class="container mt-5 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-success text-white rounded-top-4 text-center">
+          <h4 class="mb-0">Reserva Exitosa</h4>
+        </div>
+        <div class="card-body text-center py-5">
+          <h5 class="mb-4">¡Gracias por reservar!</h5>
+          <p class="mb-4">
+            Tu turno para <strong>{{ turno.servicio.nombre }}</strong><br>
+            ha sido confirmado para el día <strong>{{ turno.fecha }}</strong><br>
+            a las <strong>{{ turno.hora|time:"H:i" }}</strong>.
+          </p>
+
+          <div class="d-grid gap-3">
+            <a href="{% url 'mis_turnos' %}" class="btn btn-success btn-lg" style="background-color: #A3D9A5; border-color: #A3D9A5;">
+              Ver mis turnos
+            </a>
+            <a href="{% url 'inicio' %}" class="btn btn-outline-secondary btn-lg">
+              Volver al inicio
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

@@ -1,29 +1,61 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container mt-5" style="max-width: 500px;">
-  <h2 class="mb-4">Reservar: {{ servicio.nombre }} — {{ day }}</h2>
 
-  {% if slots %}
-    <form method="post">
-      {% csrf_token %}
-      <div class="list-group">
-        {% for slot in slots %}
-          <label class="list-group-item">
-            <input type="radio" name="slot_id" value="{{ slot.id }}" required>
-            {{ slot.hora_inicio|time:"H:i" }} – {{ slot.hora_fin|time:"H:i" }}
-          </label>
-        {% endfor %}
+  <!-- CSS local SOLO para esta página de reserva -->
+  <style>
+    .btn-service {
+      background-color: #A3D9A5;
+      border-color:     #A3D9A5;
+      color:            white;
+      box-shadow:       0 2px 4px rgba(0,0,0,0.1);
+      transition:       transform .2s ease,
+                        box-shadow .2s ease,
+                        background-color .2s ease;
+    }
+    .btn-service:hover {
+      /* un tono de verde un poco más oscuro */
+      background-color: #8CC48E;
+      border-color:     #8CC48E;
+      transform:        translateY(-3px);
+      box-shadow:       0 6px 12px rgba(0,0,0,0.2);
+      color:            white;  /* seguimos con letra blanca */
+    }
+  </style>
+
+  <div class="container mt-5" style="max-width: 500px;">
+    <h2 class="mb-4">Reservar: {{ servicio.nombre }} — {{ day }}</h2>
+
+    {% if slots %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="list-group">
+          {% for slot in slots %}
+            <label class="list-group-item">
+              <input type="radio" name="slot_id" value="{{ slot.id }}" required>
+              {{ slot.hora_inicio|time:"H:i" }} – {{ slot.hora_fin|time:"H:i" }}
+            </label>
+          {% endfor %}
+        </div>
+
+        <!-- Botón con nuestra clase personalizada -->
+        <button type="submit"
+                class="btn btn-service mt-3">
+          Siguente
+        </button>
+      </form>
+    {% else %}
+      <div class="alert alert-warning">
+        No hay franjas disponibles para este día.
       </div>
-      <button type="submit" class="btn btn-success mt-3">Confirmar Reserva</button>
-    </form>
-  {% else %}
-    <div class="alert alert-warning">
-      No hay franjas disponibles para este día.
-    </div>
-  {% endif %}
+    {% endif %}
 
-  <a href="{% url 'calendario_servicio' servicio.id %}" class="btn btn-link mt-3">
-    &laquo; Volver al calendario
-  </a>
-</div>
+    <p class="mt-3">
+        <a href="{% url 'calendario_servicio' servicio.id %}"
+            class="text-secondary">&laquo; Volver al calendario
+        </a>
+    </p>
+
+  </div>
+
 {% endblock %}
+

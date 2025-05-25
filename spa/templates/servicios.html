@@ -1,8 +1,5 @@
 {% extends "base.html" %}
 
-{# --------------------------------------------
-   Sobrescribimos el banner para esta vista
-   -------------------------------------------- #}
 {% block banner_content %}
 <div class="text-center-custom">
   <h1 class="display-4 fw-bold">Descubra un mundo de opciones</h1>
@@ -11,23 +8,19 @@
 
 {% block content %}
 <div class="container mt-5" id="servicesList">
-  {# Título dinámico #}
   {% if current_subcategoria %}
     <h2 class="mb-4">{{ current_subcategoria.nombre }}</h2>
   {% else %}
     <h2 class="mb-4">Servicios</h2>
   {% endif %}
 
-  <!-- Formulario de filtro por categoría -->
   <form method="GET" class="mb-4">
     <div class="form-group">
       <label for="subcategoria">Filtrar por categoría</label>
-      <select name="subcategoria" id="subcategoria" class="form-control"
-              onchange="this.form.submit()">
+      <select name="subcategoria" id="subcategoria" class="form-control" onchange="this.form.submit()">
         <option value="">Seleccionar categoría</option>
         {% for sub in subcategorias %}
-          <option value="{{ sub.id }}"
-                  {% if current_subcategoria and current_subcategoria.id == sub.id %}selected{% endif %}>
+          <option value="{{ sub.id }}" {% if current_subcategoria and current_subcategoria.id == sub.id %}selected{% endif %}>
             {{ sub.nombre }}
           </option>
         {% endfor %}
@@ -35,7 +28,6 @@
     </div>
   </form>
 
-  {# Si hay filtro activo, muestro solo esos servicios #}
   {% if current_subcategoria %}
     <div class="row">
       {% for servicio in servicios %}
@@ -47,12 +39,13 @@
             <div class="card-body d-flex flex-column">
               <h5 class="card-title">{{ servicio.nombre }}</h5>
               <p class="card-text">{{ servicio.descripcion }}</p>
+              <p class="card-text"><span class="badge bg-success">Precio: ${{ servicio.precio }}</span></p>
               {% if user.is_staff %}
                 <a href="{% url 'admin_lista_turnos' servicio.id %}"
-                   class="btn btn-warning mt-auto" style="background-color: pink;border-color: white">Solicitar Turno</a>
+                   class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Editar</a>
               {% else %}
                 <a href="{% url 'calendario_servicio' servicio.id %}"
-                   class="btn btn-primary mt-auto" style="background-color: pink;border-color: white">Solicitar turno</a>
+                   class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Solicitar turno</a>
               {% endif %}
             </div>
           </div>
@@ -61,8 +54,6 @@
         <p class="text-muted">No hay servicios para esta categoría.</p>
       {% endfor %}
     </div>
-
-  {# Si no hay filtro, agrupo por cada categoría #}
   {% else %}
     {% for sub in subcategorias %}
       <h3 class="mt-5 mb-3">{{ sub.nombre }}</h3>
@@ -76,12 +67,13 @@
               <div class="card-body d-flex flex-column">
                 <h5 class="card-title">{{ servicio.nombre }}</h5>
                 <p class="card-text">{{ servicio.descripcion }}</p>
+                <p class="card-text"><span class="badge bg-success">Precio: ${{ servicio.precio }}</span></p>
                 {% if user.is_staff %}
                   <a href="{% url 'admin_lista_turnos' servicio.id %}"
-                     class="btn btn-warning mt-auto" style="background-color: pink;border-color: white">Solicitar Turno</a>
+                     class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Editar</a>
                 {% else %}
                   <a href="{% url 'calendario_servicio' servicio.id %}"
-                     class="btn btn-primary mt-auto">Solicitar turno</a>
+                     class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Solicitar turno</a>
                 {% endif %}
               </div>
             </div>
@@ -96,13 +88,11 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function(){
-    // si venimos con filtro, no saltar al top
     if (new URLSearchParams(window.location.search).has('subcategoria')) {
       const lista = document.getElementById('servicesList');
       if (lista) lista.scrollIntoView({ behavior: 'smooth' });
     }
   });
 </script>
-{% include 'footer.html' %} 
+{% include 'footer.html' %}
 {% endblock %}
-

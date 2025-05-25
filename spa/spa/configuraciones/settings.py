@@ -25,7 +25,13 @@ SECRET_KEY = 'django-insecure-%ky9rk$c_g28j6p^h@)#rlz)y+#t*b1db@0gpx01__ux+kmufv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",               # desarrollo local
+    "localhost",               # desarrollo local
+    "martinvz.pythonanywhere.com",  # dominio en PythonAnywhere
+]
+
+
 
 
 # Application definition
@@ -130,7 +136,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 import os
 
-# Para la carga de archivos media (imágenes, etc.)
+# Esto asegura que la ruta MEDIA_ROOT se base en el directorio raíz de tu proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'  # Esto define la URL accesible desde el navegador
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Esta es la ruta física a tus archivos multimedia
+
+
+
+
+
+
+
+STATIC_URL = '/static/'
+
+# Ruta donde Django va a recopilar los archivos estáticos con collectstatic
+STATIC_ROOT = os.path.join(BASE_DIR, 'spa/staticfiles')  # Para la carpeta donde se recopilarán los archivos
+
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'spa/static'),  # Ruta correcta a la carpeta 'static'
+]
+
+# Envío de mails
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'juanpablolenain222@gmail.com'  # tu correo real
+EMAIL_HOST_PASSWORD = 'bgyo wfpx vnmh esyq'  # la contraseña de aplicación
+DEFAULT_FROM_EMAIL = 'Spa Bienestar <spabienestar@gmail.com>'
+

@@ -18,10 +18,12 @@ urlpatterns = [
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
     path('turnos/', views.turnos, name='turnos'),
     path('consultas/', views.consulta_view, name='consultas'),
-   
 
     # Reserva
     path('turno/<int:turno_id>/confirmacion/', views.reserva_exitosa, name='reserva_exitosa'),
+
+    # Método de pago simulado
+    path('servicio/<int:servicio_id>/pagar/<str:fecha_str>/<int:slot_id>/', views.pagar_turno, name='pagar_turno'),
 
     # Administración de turnos (solo staff)
     path('admin/servicios/<int:servicio_id>/turnos/',
@@ -48,6 +50,13 @@ urlpatterns = [
     # Perfil de usuario
     path('perfil/', views.perfil, name='perfil'),
     path('mis-turnos/', views.mis_turnos, name='mis_turnos'),
+
+    path(
+    'servicio/<int:servicio_id>/elegir-pago/<str:fecha_str>/<int:slot_id>/',
+    views.elegir_pago,
+    name='elegir_pago'
+),
+
 ]
 
 if settings.DEBUG:

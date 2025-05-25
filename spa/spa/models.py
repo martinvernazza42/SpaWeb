@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
 # MODELOS PARA CATEGORÍAS Y SUBCATEGORÍAS
 class CategoriaServicio(models.Model):
     nombre = models.CharField(max_length=100)
@@ -12,7 +11,7 @@ class CategoriaServicio(models.Model):
 
 class SubcategoriaServicio(models.Model):
     nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True)  # Este es el nuevo campo
+    descripcion = models.TextField(blank=True)
     categoria = models.ForeignKey(CategoriaServicio, on_delete=models.CASCADE, related_name='subcategorias')
 
     def __str__(self):
@@ -31,7 +30,8 @@ class Servicio(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     imagen = models.ImageField(upload_to='servicios/', blank=True, null=True)
-    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.CASCADE)  # Relación de clave foránea
+    subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.CASCADE)
+    precio = models.PositiveIntegerField(default=10000)  # Campo de precio agregado
 
     def __str__(self):
         return self.nombre
@@ -71,7 +71,7 @@ class Disponibilidad(models.Model):
 
 class Consulta(models.Model):
     nombre = models.CharField(max_length=100)
-    email = models.EmailField()  # Ahora obligatorio
+    email = models.EmailField()
     mensaje = models.TextField()
 
     def __str__(self):

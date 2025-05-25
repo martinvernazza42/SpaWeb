@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+  <h3 class="text-center mb-4">¿Cómo deseas pagar tu turno?</h3>
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="opcion" value="online">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body text-center">
+            <h5 class="card-title">💳 Pagar ahora</h5>
+            <p class="card-text">Aboná online y asegurá tu reserva al instante.</p>
+            <button class="btn btn-success w-100">Pagar ahora</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-md-5">
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="opcion" value="consultorio">
+        <div class="card shadow-sm mb-4">
+          <div class="card-body text-center">
+            <h5 class="card-title">🏥 Pagar en el consultorio</h5>
+            <p class="card-text">Reservá sin pagar ahora y aboná cuando vengas.</p>
+            <button class="btn btn-outline-primary w-100">Pagar en el consultorio</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
