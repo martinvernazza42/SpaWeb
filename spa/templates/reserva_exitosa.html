@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container mt-5 mb-5">
@@ -10,14 +11,20 @@
         </div>
         <div class="card-body text-center py-5">
           <h5 class="mb-4">¡Gracias por reservar!</h5>
-          <p class="mb-4">
-            Tu turno para <strong>{{ turno.servicio.nombre }}</strong><br>
-            ha sido confirmado para el día <strong>{{ turno.fecha }}</strong><br>
-            a las <strong>{{ turno.hora|time:"H:i" }}</strong>.
-          </p>
+          <p class="mb-4">Tus turnos han quedado confirmados:</p>
+          
+          <ul class="list-group mb-4 text-start">
+            {% for turno in turnos %}
+              <li class="list-group-item">
+                <strong>{{ turno.servicio.nombre }}</strong><br>
+                Fecha: {{ turno.fecha|date:"d/m/Y" }}<br>
+                Hora: {{ turno.hora|time:"H:i" }}
+              </li>
+            {% endfor %}
+          </ul>
 
           <div class="d-grid gap-3">
-            <a href="{% url 'mis_turnos' %}" class="btn btn-success btn-lg" style="background-color: #A3D9A5; border-color: #A3D9A5;">
+            <a href="{% url 'mis_turnos' %}" class="btn btn-success btn-lg">
               Ver mis turnos
             </a>
             <a href="{% url 'inicio' %}" class="btn btn-outline-secondary btn-lg">
@@ -30,3 +37,4 @@
   </div>
 </div>
 {% endblock %}
+

@@ -9,12 +9,15 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.dateparse import parse_date
 from django.core.mail import send_mail 
-
-
+from .models import Servicio, Turno, Cart, CartItem
 from .forms import CustomAuthForm
 from .forms import RegistroUsuarioForm, ConsultaForm, DisponibilidadForm
 from .forms import PagoForm
 from .models import SubcategoriaServicio, Servicio, Disponibilidad, Turno, Cliente, Consulta
+from django.views.decorators.http import require_http_methods
+from django.urls import reverse
+
+
 
 # -------------------------------------------------------------------
 # Vistas Públicas
@@ -362,3 +365,124 @@ def elegir_pago(request, servicio_id, fecha_str, slot_id):
         'slot': slot,
         'fecha_str': fecha_str,
     })
+
+
+def _get_cart(request):
+    session_key = request.session.session_key or request.session.create()
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+        if not cart:
+            cart = Cart.objects.create(user=request.user)
+    else:
+        cart = Cart.objects.filter(session_key=session_key).first()
+        if not cart:
+            cart = Cart.objects.create(session_key=session_key)
+    return cart
+
+
+def add_to_cart(request, servicio_id, fecha, hora):
+    # 1) Recuperar el servicio y parsear fecha/hora
+    servicio = get_object_or_404(Servicio, id=servicio_id)
+    fecha_dt = timezone.datetime.strptime(fecha, '%Y-%m-%d').date()
+    hora_dt  = timezone.datetime.strptime(hora,   '%H:%M').time()
+
+    # 2) Verificar que siga existiendo esa disponibilidad
+    disp = servicio.disponibilidades.filter(
+        fecha=fecha_dt, hora_inicio=hora_dt
+    ).first()
+    if not disp:
+        messages.error(request, "Ese turno ya no está disponible.")
+        return redirect('servicios')
+
+    # 3) Añadir al carrito (evita duplicados)
+    cart = _get_cart(request)
+    CartItem.objects.get_or_create(
+        cart     = cart,
+        servicio = servicio,
+        fecha    = fecha_dt,
+        hora     = hora_dt,
+        hora_fin = disp.hora_fin
+    )
+
+    # 4) Mensaje flash
+    
+
+    # 5) Redirect forzado a esta misma reserva_por_fecha
+    #    (servicio_id, año, mes, día)
+    return redirect(
+        reverse(
+            'reservar_por_fecha',
+            args=[servicio_id, fecha_dt.year, fecha_dt.month, fecha_dt.day]
+        )
+    )
+
+def view_cart(request):
+    cart = _get_cart(request)
+    items = cart.items.select_related('servicio').all()
+    total = sum(item.servicio.precio for item in items)
+    return render(request, 'cart.html', {
+        'items': items,
+        'total': total,
+    })
+
+@require_http_methods(["GET", "POST"])
+def checkout(request):
+    cart  = _get_cart(request)
+    items = list(cart.items.select_related('servicio'))
+    total = sum(item.servicio.precio for item in items)
+
+    # POST: procesar pago y crear turnos
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, "Debes iniciar sesión para completar la reserva.")
+            return redirect('login')
+
+        try:
+            cliente_obj = Cliente.objects.get(user=request.user)
+        except Cliente.DoesNotExist:
+            messages.error(request, "No pudimos encontrar tu perfil de Cliente.")
+            return redirect('perfil')
+
+        turnos_reservados = []
+        for item in items:
+            turno = Turno.objects.create(
+                cliente  = cliente_obj,
+                servicio = item.servicio,
+                fecha    = item.fecha,
+                hora     = item.hora
+            )
+            turnos_reservados.append(turno)
+
+        cart.items.all().delete()
+        return render(request, 'reserva_exitosa.html', {
+            'turnos': turnos_reservados
+        })
+
+    # GET: mostrar formulario de pago
+    # 1) Determinar si es pago anticipado (>48 h antes del primer turno)
+    hoy = timezone.now().date()
+    if items:
+        primer_dia = min(item.fecha for item in items)
+        anticipado = (primer_dia - hoy) >= timedelta(days=2)
+    else:
+        anticipado = False
+
+    # 2) Calcular precios
+    precio_base      = total
+    precio_descuento = round(total * 0.85, 2) if anticipado else total
+
+    return render(request, 'pago.html', {
+        'items':             items,
+        'total':             total,
+        'anticipado':        anticipado,
+        'precio_base':       precio_base,
+        'precio_descuento':  precio_descuento,
+    })
+
+def cart_remove(request, item_id):
+    """
+    Elimina un CartItem y redirige de vuelta al carrito.
+    """
+    ci = get_object_or_404(CartItem, id=item_id)
+    ci.delete()
+    return redirect('view_cart')

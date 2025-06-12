@@ -76,3 +76,24 @@ class Consulta(models.Model):
 
     def __str__(self):
         return self.nombre
+
+from django.conf import settings
+from django.db import models
+
+class Cart(models.Model):
+    user        = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                    null=True, blank=True,
+                                    on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    created     = models.DateTimeField(auto_now_add=True)
+
+class CartItem(models.Model):
+    cart     = models.ForeignKey(Cart, related_name='items',
+                                 on_delete=models.CASCADE)
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    fecha    = models.DateField()
+    hora     = models.TimeField()
+    hora_fin = models.TimeField()
+
+    class Meta:
+        unique_together = ('cart','servicio','fecha','hora')
