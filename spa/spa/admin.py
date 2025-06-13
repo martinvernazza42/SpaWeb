@@ -46,3 +46,10 @@ class ConsultaAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'email', 'mensaje']  # Ajusta la lista de campos para mostrar en la vista admin
 
 admin.site.register(Consulta, ConsultaAdmin)
+
+from .models import Profesional
+
+@admin.register(Profesional)
+class ProfesionalAdmin(admin.ModelAdmin):
+    list_display = ('user', 'servicio')
+    search_fields = ('user__username', 'user__email')

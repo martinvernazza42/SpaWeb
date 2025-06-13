@@ -1,5 +1,6 @@
 import calendar
 from datetime import datetime, timedelta, date as _date
+from datetime import date, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.utils import timezone
@@ -8,16 +9,20 @@ from django.contrib.auth import views as auth_views
 from django.contrib.auth import logout as auth_logout
 from django.contrib.admin.views.decorators import staff_member_required
 from django.utils.dateparse import parse_date
-from django.core.mail import send_mail 
-from .models import Servicio, Turno, Cart, CartItem
-from .forms import CustomAuthForm
-from .forms import RegistroUsuarioForm, ConsultaForm, DisponibilidadForm
-from .forms import PagoForm
-from .models import SubcategoriaServicio, Servicio, Disponibilidad, Turno, Cliente, Consulta
+from django.core.mail import send_mail
 from django.views.decorators.http import require_http_methods
 from django.urls import reverse
 
-
+from .models import (
+    Servicio, Turno, Cart, CartItem,
+    SubcategoriaServicio, Disponibilidad,
+    Cliente, Consulta, Profesional
+)
+from .forms import (
+    CustomAuthForm, RegistroUsuarioForm,
+    ConsultaForm, DisponibilidadForm,
+    PagoForm
+)
 
 # -------------------------------------------------------------------
 # Vistas Públicas
@@ -28,11 +33,9 @@ def index(request):
 
 
 def servicios(request):
-    # Capturamos el filtro de subcategoría (categoría)
     subcategoria_id = request.GET.get('subcategoria')
 
     if subcategoria_id:
-        # Objeto de la categoría seleccionada
         current_subcategoria = get_object_or_404(SubcategoriaServicio, pk=subcategoria_id)
         servicios = Servicio.objects.filter(subcategoria=current_subcategoria)
     else:
@@ -73,7 +76,6 @@ def calendario_servicio(request, servicio_id):
     hoy = _date.today()
     ahora = timezone.now()
 
-    # Año/mes del querystring (o hoy)
     try:
         year = int(request.GET.get('year', hoy.year))
     except ValueError:
@@ -83,7 +85,6 @@ def calendario_servicio(request, servicio_id):
     except ValueError:
         month = hoy.month
 
-    # Cálculo de mes anterior / siguiente
     if month == 1:
         prev_month, prev_year = 12, year - 1
     else:
@@ -96,19 +97,16 @@ def calendario_servicio(request, servicio_id):
     cal = calendar.Calendar(firstweekday=0)
     month_days = cal.monthdatescalendar(year, month)
 
-    # Traigo todas las disponibilidades del mes...
     qs = Disponibilidad.objects.filter(
         servicio=servicio,
         fecha__year=year,
         fecha__month=month
     )
 
-    # Filtrar slots libres y a más de 48 horas
     disponibles = []
     cutoff = ahora + timedelta(hours=48)
     for d in qs:
         slot_dt = datetime.combine(d.fecha, d.hora_inicio)
-        # Aware datetime si es naive
         if timezone.is_naive(slot_dt):
             slot_dt = timezone.make_aware(slot_dt)
         if slot_dt >= cutoff:
@@ -120,7 +118,6 @@ def calendario_servicio(request, servicio_id):
             if not ya_tomado:
                 disponibles.append(d)
 
-    # Construyo el set de días que todavía están libres
     available = {d.fecha.day for d in disponibles}
 
     return render(request, 'calendario_servicio.html', {
@@ -142,10 +139,7 @@ def reservar_por_fecha(request, servicio_id, year, month, day):
     servicio = get_object_or_404(Servicio, pk=servicio_id)
     fecha_obj = _date(year, month, day)
 
-    # 🔽 Traer todas las disponibilidades para ese día
     todos_los_slots = Disponibilidad.objects.filter(servicio=servicio, fecha=fecha_obj)
-
-    # 🔽 Filtrar SOLO los que no están tomados
     slots = [slot for slot in todos_los_slots if not Turno.objects.filter(
         servicio=servicio,
         fecha=fecha_obj,
@@ -177,7 +171,6 @@ def reservar_por_fecha(request, servicio_id, year, month, day):
     })
 
 
-
 @login_required
 def reserva_exitosa(request, turno_id):
     turno = get_object_or_404(
@@ -204,12 +197,10 @@ def logout_view(request):
     auth_logout(request)
     return redirect('login')
 
-
 login_view = auth_views.LoginView.as_view(
     template_name='login.html',
     authentication_form=CustomAuthForm,
 )
-
 
 @login_required
 def perfil(request):
@@ -220,12 +211,35 @@ def perfil(request):
         'consultas': consultas
     })
 
-
+@login_required
 def mis_turnos(request):
-    cliente = get_object_or_404(Cliente, user=request.user)
-    turnos = Turno.objects.filter(cliente=cliente).order_by('fecha', 'hora')
-    return render(request, 'mis_turnos.html', {'turnos': turnos})
+    user = request.user
 
+    # Si es Profesional, muestro los turnos de su servicio en la semana actual
+    if hasattr(user, 'profesional'):
+        prof = user.profesional
+        hoy = date.today()
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
+        fin_semana    = inicio_semana + timedelta(days=14)
+
+        turnos = Turno.objects.filter(
+            servicio=prof.servicio,
+            fecha__range=(inicio_semana, fin_semana)
+        ).order_by('fecha', 'hora')
+
+        return render(request, 'profesional_turnos.html', {
+            'turnos': turnos,
+            'servicio': prof.servicio,
+            'inicio_semana': inicio_semana,
+            'fin_semana': fin_semana,
+        })
+
+    # Si no es Profesional, asumo que es Cliente
+    cliente = get_object_or_404(Cliente, user=user)
+    turnos = Turno.objects.filter(cliente=cliente).order_by('fecha', 'hora')
+    return render(request, 'mis_turnos.html', {
+        'turnos': turnos
+    })
 
 @staff_member_required
 def admin_lista_turnos(request, servicio_id):
@@ -235,7 +249,6 @@ def admin_lista_turnos(request, servicio_id):
         'servicio': servicio,
         'turnos': turnos
     })
-
 
 @staff_member_required
 def admin_editar_turno(request, servicio_id=None, turno_id=None):
@@ -259,18 +272,12 @@ def admin_editar_turno(request, servicio_id=None, turno_id=None):
         'nuevo': turno_id is None
     })
 
-
 @staff_member_required
 def admin_eliminar_turno(request, turno_id):
     turno = get_object_or_404(Disponibilidad, pk=turno_id)
     servicio_id = turno.servicio.id
     turno.delete()
     return redirect('admin_lista_turnos', servicio_id=servicio_id)
-
-
-
-from datetime import timedelta, datetime
-from django.utils import timezone
 
 @login_required
 def pagar_turno(request, servicio_id, fecha_str, slot_id):
@@ -290,7 +297,6 @@ def pagar_turno(request, servicio_id, fecha_str, slot_id):
     if request.method == 'POST':
         form = PagoForm(request.POST)
         metodo = request.POST.get('metodo_pago')
-        print("POST data:", request.POST)
         if form.is_valid():
             if metodo == "debito" and anticipado:
                 descuento = 0.15
@@ -306,7 +312,6 @@ def pagar_turno(request, servicio_id, fecha_str, slot_id):
                 hora=slot.hora_inicio
             )
 
-            # ✅ Enviar mail (a consola en DEBUG)
             send_mail(
                 subject="Comprobante de pago - Spa Bienestar",
                 message=(
@@ -324,8 +329,6 @@ def pagar_turno(request, servicio_id, fecha_str, slot_id):
             )
             messages.success(request, f"Tu pago de ${precio_final:,} fue procesado con éxito.")
             return redirect('reserva_exitosa', turno_id=turno.id)
-        else:
-            print("Errores del formulario:", form.errors)
     else:
         form = PagoForm()
 
@@ -338,7 +341,6 @@ def pagar_turno(request, servicio_id, fecha_str, slot_id):
         'precio_base': precio_base,
         'precio_descuento': int(precio_base * 0.85) if anticipado else None
     })
-
 
 @login_required
 def elegir_pago(request, servicio_id, fecha_str, slot_id):
@@ -381,12 +383,10 @@ def _get_cart(request):
 
 
 def add_to_cart(request, servicio_id, fecha, hora):
-    # 1) Recuperar el servicio y parsear fecha/hora
     servicio = get_object_or_404(Servicio, id=servicio_id)
     fecha_dt = timezone.datetime.strptime(fecha, '%Y-%m-%d').date()
     hora_dt  = timezone.datetime.strptime(hora,   '%H:%M').time()
 
-    # 2) Verificar que siga existiendo esa disponibilidad
     disp = servicio.disponibilidades.filter(
         fecha=fecha_dt, hora_inicio=hora_dt
     ).first()
@@ -394,7 +394,6 @@ def add_to_cart(request, servicio_id, fecha, hora):
         messages.error(request, "Ese turno ya no está disponible.")
         return redirect('servicios')
 
-    # 3) Añadir al carrito (evita duplicados)
     cart = _get_cart(request)
     CartItem.objects.get_or_create(
         cart     = cart,
@@ -404,17 +403,13 @@ def add_to_cart(request, servicio_id, fecha, hora):
         hora_fin = disp.hora_fin
     )
 
-    # 4) Mensaje flash
-    
-
-    # 5) Redirect forzado a esta misma reserva_por_fecha
-    #    (servicio_id, año, mes, día)
     return redirect(
         reverse(
             'reservar_por_fecha',
             args=[servicio_id, fecha_dt.year, fecha_dt.month, fecha_dt.day]
         )
     )
+
 
 def view_cart(request):
     cart = _get_cart(request)
@@ -431,7 +426,6 @@ def checkout(request):
     items = list(cart.items.select_related('servicio'))
     total = sum(item.servicio.precio for item in items)
 
-    # POST: procesar pago y crear turnos
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(request, "Debes iniciar sesión para completar la reserva.")
@@ -458,8 +452,6 @@ def checkout(request):
             'turnos': turnos_reservados
         })
 
-    # GET: mostrar formulario de pago
-    # 1) Determinar si es pago anticipado (>48 h antes del primer turno)
     hoy = timezone.now().date()
     if items:
         primer_dia = min(item.fecha for item in items)
@@ -467,7 +459,6 @@ def checkout(request):
     else:
         anticipado = False
 
-    # 2) Calcular precios
     precio_base      = total
     precio_descuento = round(total * 0.85, 2) if anticipado else total
 
@@ -479,10 +470,8 @@ def checkout(request):
         'precio_descuento':  precio_descuento,
     })
 
+
 def cart_remove(request, item_id):
-    """
-    Elimina un CartItem y redirige de vuelta al carrito.
-    """
     ci = get_object_or_404(CartItem, id=item_id)
     ci.delete()
     return redirect('view_cart')

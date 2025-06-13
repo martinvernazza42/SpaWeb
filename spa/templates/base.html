@@ -1,4 +1,5 @@
 {% load static %}
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -57,8 +58,9 @@
         z-index: 1;
       }
 
-      nav {
-        background-color: transparent;
+      /* Estilos para el navbar */
+      .navbar {
+        background-color: transparent !important;
         padding: 15px 30px;
         z-index: 3;
         position: fixed;
@@ -67,17 +69,17 @@
         width: 100%;
         transition: background-color 0.5s ease, color 0.5s ease;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
       }
 
-      nav.scrolled {
-        background-color: white;
+      .navbar.scrolled {
+        background-color: white !important;
       }
 
-      /* Navbar links: Montserrat font */
-      nav a {
+      .navbar-brand img {
+        height: 50px;
+      }
+
+      .navbar-nav .nav-link {
         text-decoration: none;
         color: white;
         font-family: 'Montserrat', sans-serif;
@@ -89,7 +91,11 @@
         display: inline-block;
       }
 
-      nav a::after {
+      .navbar.scrolled .navbar-nav .nav-link {
+        color: black;
+      }
+
+      .navbar-nav .nav-link::after {
         content: "";
         position: absolute;
         width: 100%;
@@ -102,22 +108,14 @@
         transition: transform 0.25s ease-out;
       }
 
-      nav a:hover::after {
+      .navbar-nav .nav-link:hover::after {
         transform: scaleX(1);
         transform-origin: bottom left;
       }
 
-      nav a:hover {
+      .navbar-nav .nav-link:hover {
         transform: translateY(-3px);
-        color: #ff66b2;
-      }
-
-      nav.scrolled a {
-        color: black;
-      }
-
-      .navbar-logo {
-        height: 50px;
+        color: #ff66b2 !important;
       }
 
       .table tbody td {
@@ -201,12 +199,15 @@
         position: relative;
       }
 
-      /* Estilos para el ícono del carrito */
+      /* Ícono del carrito */
       .cart-icon {
         font-size: 1.25rem;
         color: white;
         margin-left: 24px;
         transition: color 0.3s ease-in-out;
+      }
+      .navbar.scrolled .cart-icon {
+        color: black;
       }
       .cart-icon:hover {
         color: #ff66b2;
@@ -217,52 +218,110 @@
     <div id="background-container">
       <div class="overlay"></div>
 
-      <nav id="navbar">
-        <div>
-          <a href="{% url 'inicio' %}">
+      <nav class="navbar navbar-expand-lg" id="navbar">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="{% url 'inicio' %}">
             <img src="{% static 'logo.png' %}" class="navbar-logo" alt="Logo" />
             <img src="{% static 'logo-spa2.png' %}" class="navbar-logo" alt="Logo" />
           </a>
-        </div>
-        <div>
-          <a href="{% url 'servicios' %}">Servicios</a>
-          <a href="{% url 'consultas' %}">Consultas</a>
-          <a href="{% url 'quienes_somos' %}">Quiénes somos</a>
-          {% if user.is_authenticated %}
-            <a href="{% url 'mis_turnos' %}">Mis turnos</a>
-            <a href="{% url 'perfil' %}">Perfil</a>
-            {# MODIFICACIÓN DEL CARRITO AQUÍ #}
-            <a href="{% url 'view_cart' %}" class="cart-icon position-relative">
-              <i class="fa-solid fa-cart-shopping"></i>
-              {% if cart_count > 0 %}
-                <span
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                  style="font-size:.65rem; line-height:1;"
-                >
-                  {{ cart_count }}
-                  <span class="visually-hidden">items en carrito</span>
-                </span>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              {% if user.is_authenticated %}
+                {% if user|has_attr:"profesional" %}
+                  <!-- Profesionales: solo Mis Turnos, Perfil y Cerrar sesión -->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'mis_turnos' %}">Mis Turnos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                  </li>
+                {% else %}
+                  <!-- Clientes y Admin: menú completo + carrito -->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'servicios' %}">Servicios</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'consultas' %}">Consultas</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'quienes_somos' %}">Quiénes somos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'mis_turnos' %}">Mis Turnos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      href="{% url 'view_cart' %}"
+                      class="cart-icon position-relative nav-link"
+                    >
+                      <i class="fa-solid fa-cart-shopping"></i>
+                      {% if cart_count > 0 %}
+                        <span
+                          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                          style="font-size:.65rem; line-height:1;"
+                        >
+                          {{ cart_count }}
+                          <span class="visually-hidden">items en carrito</span>
+                        </span>
+                      {% endif %}
+                    </a>
+                  </li>
+                  {% if user.is_staff %}
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                  {% endif %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                  </li>
+                {% endif %}
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'registro' %}">Registro</a>
+                </li>
               {% endif %}
-            </a>
-          {% else %}
-            <a href="{% url 'login' %}">Iniciar sesión</a>
-          {% endif %}
+            </ul>
+          </div>
         </div>
       </nav>
 
       {% block banner_content %}
-      <div class="text-center-custom">
-        <h1 class="display-4 fw-bold">Porque sentirse bien...</h1>
-        <p class="lead dynamic-phrase show" id="changingPhrase">
-          es una elección diaria.
-        </p>
-        <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
-      </div>
-      {% endblock %}
+        <div class="text-center-custom">
+          <h1 class="display-4 fw-bold">Porque sentirse bien...</h1>
+          <p class="lead dynamic-phrase show" id="changingPhrase">
+            es una elección diaria.
+          </p>
+          {# Solo clientes y anónimos ven "Ver servicios" #}
+          {% if not user|has_attr:"profesional" %}
+             <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
+          {% endif %}
+        </div>
+{% endblock %}
+
     </div>
 
     {% block content %}
-    {# El contenido específico de cada página se insertará aquí #}
+    {# Aquí va el contenido de cada página #}
     {% endblock %}
 
     <script>
@@ -376,7 +435,6 @@
       chatToggle.addEventListener('click', () => chatCanvas.show());
 
       async function sendMessage(text) {
-        // muestra mensaje del usuario
         msgContainer.innerHTML += `
           <div class="text-end">
             <small class="text-muted">Tú</small>
@@ -384,7 +442,6 @@
           </div>`;
         msgContainer.scrollTop = msgContainer.scrollHeight;
 
-        // llama API chatbot
         const res = await fetch('/api/chat/', {
           method: 'POST',
           headers: {'Content-Type':'application/json'},
@@ -392,7 +449,6 @@
         });
         const data = await res.json();
 
-        // muestra respuesta del bot
         msgContainer.innerHTML += `
           <div class="text-start">
             <small class="text-muted">Bot</small>
@@ -411,7 +467,6 @@
         if (e.key === 'Enter') sendBtn.click();
       });
 
-      // Función auxiliar para mostrar mensajes del bot
       function appendBotMessage(text) {
         msgContainer.innerHTML += `
           <div class="text-start">
@@ -421,11 +476,13 @@
         msgContainer.scrollTop = msgContainer.scrollHeight;
       }
 
-      // Flag para que el saludo solo suceda una vez
       let greeted = false;
 
-      // Dentro del event-handler del botón de abrir chat:
       chatToggle.addEventListener('click', () => {
+        if (!greeted) {
+          appendBotMessage('¡Hola! ¿En qué puedo ayudarte?');
+          greeted = true;
+        }
       });
     </script>
   </body>

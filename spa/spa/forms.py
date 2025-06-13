@@ -175,9 +175,48 @@ class RegistroUsuarioForm(UserCreationForm):
             )
         return user
 
-class PagoForm(forms.Form):
-    nombre_tarjeta = forms.CharField(label="Nombre en la tarjeta", max_length=100)
-    numero_tarjeta = forms.CharField(label="Número de tarjeta", max_length=16, min_length=13)
-    vencimiento = forms.CharField(label="Fecha de vencimiento (MM/AA)", max_length=7)
-    codigo_seguridad = forms.CharField(label="Código de seguridad", max_length=4)
+from django import forms
 
+class PagoForm(forms.Form):
+    METODO_CHOICES = [
+        ('debito', 'Tarjeta de débito'),
+        ('credito', 'Tarjeta de crédito'),
+    ]
+
+    metodo_pago = forms.ChoiceField(
+        label="Método de Pago",
+        choices=METODO_CHOICES,
+    )
+    nombre_tarjeta = forms.CharField(
+        label="Nombre en la tarjeta",
+        max_length=100,
+        widget=forms.TextInput(attrs={'class':'form-control'})
+    )
+    numero_tarjeta = forms.CharField(
+        label="Número de tarjeta",
+        max_length=19,
+        min_length=12,
+        widget=forms.TextInput(attrs={
+            'class':'form-control',
+            'placeholder':'#### #### #### ####'
+        })
+    )
+    vencimiento = forms.CharField(
+        label="Vencimiento (MM/AA)",
+        max_length=5,
+        widget=forms.TextInput(attrs={
+            'class':'form-control',
+            'placeholder':'MM/AA',
+            'pattern': r'\d{2}/\d{2}'
+        })
+    )
+    codigo_seguridad = forms.CharField(
+        label="Código de seguridad",
+        max_length=4,
+        min_length=3,
+        widget=forms.TextInput(attrs={
+            'class':'form-control',
+            'placeholder':'CVC',
+            'type':'password'
+        })
+    )

@@ -31,7 +31,7 @@ class Servicio(models.Model):
     descripcion = models.TextField()
     imagen = models.ImageField(upload_to='servicios/', blank=True, null=True)
     subcategoria = models.ForeignKey(SubcategoriaServicio, on_delete=models.CASCADE)
-    precio = models.PositiveIntegerField(default=10000)  # Campo de precio agregado
+    precio = models.PositiveIntegerField(default=10000)
 
     def __str__(self):
         return self.nombre
@@ -77,8 +77,11 @@ class Consulta(models.Model):
     def __str__(self):
         return self.nombre
 
+
+# -------------------------------------------
+# Modelos de carrito de compras
+# -------------------------------------------
 from django.conf import settings
-from django.db import models
 
 class Cart(models.Model):
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -87,9 +90,9 @@ class Cart(models.Model):
     session_key = models.CharField(max_length=40, null=True, blank=True)
     created     = models.DateTimeField(auto_now_add=True)
 
+
 class CartItem(models.Model):
-    cart     = models.ForeignKey(Cart, related_name='items',
-                                 on_delete=models.CASCADE)
+    cart     = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
     fecha    = models.DateField()
     hora     = models.TimeField()
@@ -97,3 +100,14 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = ('cart','servicio','fecha','hora')
+
+
+# -------------------------------------------
+# Modelo Profesional agregado
+# -------------------------------------------
+class Profesional(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profesional')
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='profesionales')
+
+    def __str__(self):
+        return self.user.get_full_name() or self.user.username
