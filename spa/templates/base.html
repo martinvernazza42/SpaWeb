@@ -238,8 +238,20 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               {% if user.is_authenticated %}
-                {% if user|has_attr:"profesional" %}
-                  <!-- Profesionales: solo Mis Turnos, Perfil y Cerrar sesión -->
+                {% if user.is_staff %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'servicios' %}">Servicios</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                  </li>
+                {% elif user|has_attr:"profesional" %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'mis_turnos' %}">Mis Turnos</a>
                   </li>
@@ -249,8 +261,10 @@
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                   </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'historial_profesional' %}">Historial</a>
+                  </li>
                 {% else %}
-                  <!-- Clientes y Admin: menú completo + carrito -->
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'servicios' %}">Servicios</a>
                   </li>
@@ -283,11 +297,6 @@
                       {% endif %}
                     </a>
                   </li>
-                  {% if user.is_staff %}
-                    <li class="nav-item">
-                      <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                    </li>
-                  {% endif %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                   </li>
@@ -312,11 +321,11 @@
             es una elección diaria.
           </p>
           {# Solo clientes y anónimos ven "Ver servicios" #}
-          {% if not user|has_attr:"profesional" %}
-             <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
+          {% if not user|has_attr:"profesional" and not user.is_staff %}
+              <a href="{% url 'servicios' %}" class="btn-pink">Ver servicios</a>
           {% endif %}
         </div>
-{% endblock %}
+      {% endblock %}
 
     </div>
 
