@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const telefonoField = document.getElementById('id_telefono');
+    telefonoField.addEventListener('input', function(e) {
+      // Reemplazar cualquier carácter que no sea un número
+      this.value = this.value.replace(/[^0-9]/g, '');
+    });
+  });
+</script>
+
 <style>
   .login-card {
     max-width: 400px;

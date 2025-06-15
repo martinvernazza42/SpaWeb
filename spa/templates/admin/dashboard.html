@@ -1,0 +1,134 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h4><i class="fas fa-tachometer-alt me-1"></i> Dashboard</h4>
+  </div>
+  <div class="card-body">
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-primary text-white mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Servicios</h5>
+            <p class="card-text display-4">{{ total_servicios }}</p>
+          </div>
+          <div class="card-footer d-flex align-items-center justify-content-between">
+            <span class="text-white">Total servicios</span>
+            <div class="small text-white"><i class="fas fa-spa"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-success text-white mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Clientes</h5>
+            <p class="card-text display-4">{{ total_clientes }}</p>
+          </div>
+          <div class="card-footer d-flex align-items-center justify-content-between">
+            <span class="text-white">Total clientes</span>
+            <div class="small text-white"><i class="fas fa-users"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-warning text-white mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Consultas</h5>
+            <p class="card-text display-4">{{ total_consultas }}</p>
+          </div>
+          <div class="card-footer d-flex align-items-center justify-content-between">
+            <span class="text-white">Total consultas</span>
+            <div class="small text-white"><i class="fas fa-question-circle"></i></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card bg-danger text-white mb-4">
+          <div class="card-body">
+            <h5 class="card-title">Turnos Hoy</h5>
+            <p class="card-text display-4">{{ turnos_hoy }}</p>
+          </div>
+          <div class="card-footer d-flex align-items-center justify-content-between">
+            <span class="text-white">{{ hoy|date:"d/m/Y" }}</span>
+            <div class="small text-white"><i class="fas fa-calendar-day"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Próximos Turnos
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Servicio</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for turno in turnos_proximos %}
+                <tr>
+                  <td>{{ turno.cliente }}</td>
+                  <td>{{ turno.servicio }}</td>
+                  <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+                  <td>{{ turno.hora|time:"H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center">No hay turnos próximos</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <i class="fas fa-chart-bar me-1"></i>
+            Servicios Disponibles
+          </div>
+          <div class="card-body">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Servicio</th>
+                  <th>Precio</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for servicio in servicios %}
+                <tr>
+                  <td>{{ servicio.nombre }}</td>
+                  <td>${{ servicio.precio }}</td>
+                  <td>
+                    <a href="{% url 'admin_lista_turnos' servicio.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-calendar"></i> Gestionar Turnos
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" class="text-center">No hay servicios disponibles</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

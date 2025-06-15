@@ -1,0 +1,46 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="card mb-4">
+  <div class="card-header">
+    <h4><i class="fas fa-reply me-1"></i> Responder Consulta</h4>
+  </div>
+  <div class="card-body">
+    <div class="mb-4">
+      <h5>Consulta original:</h5>
+      <div class="card bg-light p-3 mb-3">
+        <div><strong>De:</strong> {{ consulta.nombre }} ({{ consulta.email }})</div>
+        <div class="mt-2">{{ consulta.mensaje }}</div>
+      </div>
+    </div>
+    
+    <form method="post">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label for="asunto" class="form-label">Asunto:</label>
+        <input type="text" class="form-control" id="asunto" name="asunto" value="Re: Consulta Spa Bienestar" required>
+      </div>
+      <div class="mb-3">
+        <label for="mensaje" class="form-label">Mensaje:</label>
+        <textarea class="form-control" id="mensaje" name="mensaje" rows="6" required>Hola {{ consulta.nombre }},
+
+Gracias por contactarnos. En respuesta a tu consulta:
+
+"{{ consulta.mensaje }}"
+
+Saludos cordiales,
+Equipo de Spa Bienestar
+</textarea>
+      </div>
+      <div class="d-flex justify-content-between">
+        <a href="{% url 'admin_consultas' %}" class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i> Volver
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-paper-plane"></i> Enviar Respuesta
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

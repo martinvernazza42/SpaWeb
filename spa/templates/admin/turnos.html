@@ -1,0 +1,231 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="card mb-4">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4><i class="fas fa-calendar-alt me-1"></i> Turnos</h4>
+      <div>
+        <a href="{% url 'turnos_lista_pdf' %}{% if fecha_desde and fecha_hasta %}?fecha_desde={{ fecha_desde }}&fecha_hasta={{ fecha_hasta }}{% endif %}" class="btn btn-danger me-2" target="_blank">
+          <i class="fas fa-file-pdf"></i> Imprimir {% if fecha_desde and fecha_hasta %}Filtrados{% else %}Todos{% endif %}
+        </a>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoTurnoModal">
+          <i class="fas fa-plus"></i> Nuevo Turno
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="mb-3">
+      <form method="get" class="row g-3">
+        <div class="col-md-4">
+          <label for="fecha_desde" class="form-label">Desde:</label>
+          <input type="date" id="fecha_desde" name="fecha_desde" class="form-control" value="{{ fecha_desde }}">
+        </div>
+        <div class="col-md-4">
+          <label for="fecha_hasta" class="form-label">Hasta:</label>
+          <input type="date" id="fecha_hasta" name="fecha_hasta" class="form-control" value="{{ fecha_hasta }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary me-2">
+            <i class="fas fa-filter"></i> Filtrar
+          </button>
+          <a href="{% url 'admin_turnos' %}" class="btn btn-secondary">
+            <i class="fas fa-sync"></i> Limpiar
+          </a>
+        </div>
+      </form>
+    </div>
+    
+    <div class="mb-3">
+      <div class="input-group">
+        <input type="text" id="buscarTurno" class="form-control" placeholder="Buscar por cliente o servicio...">
+        <button class="btn btn-outline-secondary" type="button">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+    
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Servicio</th>
+          <th>Fecha</th>
+          <th>Hora</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for turno in turnos %}
+        <tr>
+          <td>{{ turno.cliente }}</td>
+          <td>{{ turno.servicio }}</td>
+          <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+          <td>{{ turno.hora|time:"H:i" }}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <a href="{% url 'turno_pdf' turno.id %}" class="btn btn-sm btn-info" target="_blank">
+                <i class="fas fa-print"></i> Imprimir
+              </a>
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarTurnoModal{{ turno.id }}">
+                <i class="fas fa-edit"></i> Editar
+              </button>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarTurnoModal{{ turno.id }}">
+                <i class="fas fa-trash"></i> Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="text-center">No hay turnos programados</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para nuevo turno -->
+<div class="modal fade" id="nuevoTurnoModal" tabindex="-1" aria-labelledby="nuevoTurnoModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoTurnoModalLabel">Nuevo Turno</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="#">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="cliente" class="form-label">Cliente</label>
+            <select class="form-control" id="cliente" name="cliente" required>
+              {% for cliente in clientes %}
+              <option value="{{ cliente.id }}">{{ cliente }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="servicio" class="form-label">Servicio</label>
+            <select class="form-control" id="servicio" name="servicio" required>
+              {% for servicio in servicios %}
+              <option value="{{ servicio.id }}">{{ servicio }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fecha" name="fecha" required>
+          </div>
+          <div class="mb-3">
+            <label for="hora" class="form-label">Hora</label>
+            <input type="time" class="form-control" id="hora" name="hora" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modales para editar y eliminar turnos -->
+{% for turno in turnos %}
+<!-- Modal para editar turno -->
+<div class="modal fade" id="editarTurnoModal{{ turno.id }}" tabindex="-1" aria-labelledby="editarTurnoModalLabel{{ turno.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarTurnoModalLabel{{ turno.id }}">Editar Turno</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="turno_id" value="{{ turno.id }}">
+          <div class="mb-3">
+            <label for="cliente{{ turno.id }}" class="form-label">Cliente</label>
+            <select class="form-control" id="cliente{{ turno.id }}" name="cliente" required>
+              {% for cliente in clientes %}
+              <option value="{{ cliente.id }}" {% if cliente.id == turno.cliente.id %}selected{% endif %}>{{ cliente }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="servicio{{ turno.id }}" class="form-label">Servicio</label>
+            <select class="form-control" id="servicio{{ turno.id }}" name="servicio" required>
+              {% for servicio in servicios %}
+              <option value="{{ servicio.id }}" {% if servicio.id == turno.servicio.id %}selected{% endif %}>{{ servicio }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="fecha{{ turno.id }}" class="form-label">Fecha</label>
+            <input type="date" class="form-control" id="fecha{{ turno.id }}" name="fecha" value="{{ turno.fecha|date:'Y-m-d' }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="hora{{ turno.id }}" class="form-label">Hora</label>
+            <input type="time" class="form-control" id="hora{{ turno.id }}" name="hora" value="{{ turno.hora|time:'H:i' }}" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para eliminar turno -->
+<div class="modal fade" id="eliminarTurnoModal{{ turno.id }}" tabindex="-1" aria-labelledby="eliminarTurnoModalLabel{{ turno.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eliminarTurnoModalLabel{{ turno.id }}">Eliminar Turno</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el turno de <strong>{{ turno.cliente }}</strong> para el servicio <strong>{{ turno.servicio }}</strong> el día <strong>{{ turno.fecha|date:"d/m/Y" }}</strong> a las <strong>{{ turno.hora|time:"H:i" }}</strong>?</p>
+        <p class="text-danger">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="post" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="turno_id" value="{{ turno.id }}">
+          <input type="hidden" name="action" value="delete">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const buscarInput = document.getElementById('buscarTurno');
+    const tabla = document.querySelector('table');
+    const filas = tabla.querySelectorAll('tbody tr');
+    
+    buscarInput.addEventListener('keyup', function() {
+      const termino = buscarInput.value.toLowerCase();
+      
+      filas.forEach(function(fila) {
+        const cliente = fila.cells[0].textContent.toLowerCase();
+        const servicio = fila.cells[1].textContent.toLowerCase();
+        
+        if (cliente.includes(termino) || servicio.includes(termino)) {
+          fila.style.display = '';
+        } else {
+          fila.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

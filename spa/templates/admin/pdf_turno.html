@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Turno</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #ff66b2;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            margin-top: 0;
+        }
+        .turno-info {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .turno-info h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .info-row {
+            margin-bottom: 10px;
+        }
+        .info-row strong {
+            display: inline-block;
+            width: 120px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Spa Bienestar</h1>
+        <p>Comprobante de Turno</p>
+    </div>
+    
+    <div class="turno-info">
+        <h2>Información del Turno</h2>
+        <div class="info-row">
+            <strong>Cliente:</strong> {{ turno.cliente }}
+        </div>
+        <div class="info-row">
+            <strong>Servicio:</strong> {{ turno.servicio }}
+        </div>
+        <div class="info-row">
+            <strong>Fecha:</strong> {{ turno.fecha|date:"d/m/Y" }}
+        </div>
+        <div class="info-row">
+            <strong>Hora:</strong> {{ turno.hora|time:"H:i" }}
+        </div>
+        <div class="info-row">
+            <strong>Precio:</strong> ${{ turno.servicio.precio }}
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>Este documento es un comprobante de reserva de turno.</p>
+        <p>Para cualquier consulta, comuníquese con Spa Bienestar.</p>
+        <p>Fecha de impresión: {% now "d/m/Y H:i" %}</p>
+    </div>
+</body>
+</html>

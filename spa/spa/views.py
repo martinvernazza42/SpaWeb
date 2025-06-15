@@ -242,12 +242,222 @@ def mis_turnos(request):
     })
 
 @staff_member_required
+def admin_dashboard(request):
+    # Contar servicios
+    total_servicios = Servicio.objects.count()
+    
+    # Contar clientes (usuarios que no son staff y no son profesionales)
+    total_clientes = Cliente.objects.count()
+    
+    # Contar consultas
+    total_consultas = Consulta.objects.count()
+    
+    # Contar turnos de hoy
+    hoy = timezone.now().date()
+    turnos_hoy = Turno.objects.filter(fecha=hoy).count()
+    
+    # Obtener los próximos turnos para mostrar en la tabla
+    turnos_proximos = Turno.objects.filter(fecha__gte=hoy).order_by('fecha', 'hora')[:10]
+    
+    # Obtener servicios para mostrar en la tabla
+    servicios = Servicio.objects.all()
+    
+    return render(request, 'admin/dashboard.html', {
+        'servicios': servicios,
+        'turnos_proximos': turnos_proximos,
+        'total_servicios': total_servicios,
+        'total_clientes': total_clientes,
+        'total_consultas': total_consultas,
+        'turnos_hoy': turnos_hoy,
+        'hoy': hoy,
+        'active_tab': 'dashboard'
+    })
+
+@staff_member_required
+def admin_servicios(request):
+    servicios = Servicio.objects.all().order_by('subcategoria__nombre', 'nombre')
+    subcategorias = SubcategoriaServicio.objects.all()
+    
+    return render(request, 'admin/servicios.html', {
+        'servicios': servicios,
+        'subcategorias': subcategorias,
+        'active_tab': 'servicios'
+    })
+
+from django.http import HttpResponse
+from urllib.parse import quote
+from django.contrib.auth.models import User
+from .utils import render_to_pdf
+
+@staff_member_required
+def admin_turnos(request):
+    hoy = timezone.now().date()
+    
+    # Obtener fechas del filtro
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+    
+    # Filtrar turnos según las fechas proporcionadas
+    if fecha_desde and fecha_hasta:
+        try:
+            fecha_desde = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            fecha_hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+            turnos = Turno.objects.filter(fecha__range=(fecha_desde, fecha_hasta)).order_by('fecha', 'hora')
+        except ValueError:
+            # Si hay un error en el formato de fecha, mostrar todos los turnos futuros
+            turnos = Turno.objects.filter(fecha__gte=hoy).order_by('fecha', 'hora')
+    else:
+        # Por defecto, mostrar turnos futuros
+        turnos = Turno.objects.filter(fecha__gte=hoy).order_by('fecha', 'hora')
+    
+    servicios = Servicio.objects.all()
+    clientes = Cliente.objects.all()
+    
+    return render(request, 'admin/turnos.html', {
+        'turnos': turnos,
+        'servicios': servicios,
+        'clientes': clientes,
+        'fecha_desde': fecha_desde if fecha_desde else '',
+        'fecha_hasta': fecha_hasta if fecha_hasta else '',
+        'active_tab': 'turnos'
+    })
+
+@staff_member_required
+def turno_pdf(request, turno_id):
+    turno = get_object_or_404(Turno, pk=turno_id)
+    context = {'turno': turno}
+    pdf = render_to_pdf('admin/pdf_turno.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = f"turno_{turno.id}_{turno.cliente}.pdf"
+        content = f"attachment; filename={filename}"
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Error al generar el PDF", status=400)
+
+@staff_member_required
+def turnos_lista_pdf(request):
+    hoy = timezone.now().date()
+    
+    # Obtener fechas del filtro
+    fecha_desde = request.GET.get('fecha_desde')
+    fecha_hasta = request.GET.get('fecha_hasta')
+    
+    # Filtrar turnos según las fechas proporcionadas
+    if fecha_desde and fecha_hasta:
+        try:
+            fecha_desde_obj = datetime.strptime(fecha_desde, '%Y-%m-%d').date()
+            fecha_hasta_obj = datetime.strptime(fecha_hasta, '%Y-%m-%d').date()
+            turnos = Turno.objects.filter(fecha__range=(fecha_desde_obj, fecha_hasta_obj)).order_by('fecha', 'hora')
+            filename = f"turnos_{fecha_desde}_a_{fecha_hasta}.pdf"
+        except ValueError:
+            turnos = Turno.objects.filter(fecha__gte=hoy).order_by('fecha', 'hora')
+            filename = f"lista_turnos_{hoy}.pdf"
+    else:
+        turnos = Turno.objects.filter(fecha__gte=hoy).order_by('fecha', 'hora')
+        filename = f"lista_turnos_{hoy}.pdf"
+    
+    context = {
+        'turnos': turnos,
+        'fecha_desde': fecha_desde,
+        'fecha_hasta': fecha_hasta
+    }
+    
+    pdf = render_to_pdf('admin/pdf_turnos_lista.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        content = f"attachment; filename={filename}"
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Error al generar el PDF", status=400)
+
+@staff_member_required
+def admin_usuarios(request):
+    usuarios = User.objects.all().order_by('username')
+    servicios = Servicio.objects.all()
+    
+    if request.method == 'POST':
+        usuario_id = request.POST.get('usuario_id')
+        tipo = request.POST.get('tipo')
+        servicio_id = request.POST.get('servicio')
+        
+        if usuario_id and tipo:
+            usuario = get_object_or_404(User, pk=usuario_id)
+            
+            # Actualizar tipo de usuario
+            if tipo == 'admin':
+                usuario.is_staff = True
+                usuario.save()
+                # Si era profesional, eliminar ese rol
+                if hasattr(usuario, 'profesional'):
+                    usuario.profesional.delete()
+            elif tipo == 'profesional':
+                usuario.is_staff = False
+                usuario.save()
+                # Crear o actualizar profesional
+                if servicio_id:
+                    servicio = get_object_or_404(Servicio, pk=servicio_id)
+                    if hasattr(usuario, 'profesional'):
+                        usuario.profesional.servicio = servicio
+                        usuario.profesional.save()
+                    else:
+                        Profesional.objects.create(user=usuario, servicio=servicio)
+            else:  # cliente
+                usuario.is_staff = False
+                usuario.save()
+                # Si era profesional, eliminar ese rol
+                if hasattr(usuario, 'profesional'):
+                    usuario.profesional.delete()
+            
+            messages.success(request, f"El rol de {usuario.username} ha sido actualizado.")
+            return redirect('admin_usuarios')
+    
+    return render(request, 'admin/usuarios.html', {
+        'usuarios': usuarios,
+        'servicios': servicios,
+        'active_tab': 'usuarios'
+    })
+
+@staff_member_required
+def admin_consultas(request):
+    consultas = Consulta.objects.all().order_by('-id')
+    
+    return render(request, 'admin/consultas.html', {
+        'consultas': consultas,
+        'active_tab': 'consultas'
+    })
+
+@staff_member_required
+def admin_responder_consulta(request, consulta_id):
+    consulta = get_object_or_404(Consulta, pk=consulta_id)
+    
+    if request.method == 'POST':
+        asunto = request.POST.get('asunto', f"Re: Consulta Spa Bienestar")
+        mensaje = request.POST.get('mensaje', '')
+        
+        # Codificar para URL
+        asunto_encoded = quote(asunto)
+        mensaje_encoded = quote(mensaje)
+        
+        # Crear URL de Gmail
+        gmail_url = f"https://mail.google.com/mail/?view=cm&fs=1&to={consulta.email}&su={asunto_encoded}&body={mensaje_encoded}"
+        
+        # Redirigir al usuario a Gmail
+        return redirect(gmail_url)
+    
+    return render(request, 'admin/responder_consulta.html', {
+        'consulta': consulta,
+        'active_tab': 'consultas'
+    })
+
+@staff_member_required
 def admin_lista_turnos(request, servicio_id):
     servicio = get_object_or_404(Servicio, pk=servicio_id)
     turnos = Disponibilidad.objects.filter(servicio=servicio)
     return render(request, 'admin/servicio_turnos.html', {
         'servicio': servicio,
-        'turnos': turnos
+        'turnos': turnos,
+        'active_tab': 'servicios'
     })
 
 @staff_member_required
@@ -269,7 +479,8 @@ def admin_editar_turno(request, servicio_id=None, turno_id=None):
     return render(request, 'admin/editar_turno.html', {
         'form': form,
         'servicio_id': servicio_id,
-        'nuevo': turno_id is None
+        'nuevo': turno_id is None,
+        'active_tab': 'servicios'
     })
 
 @staff_member_required

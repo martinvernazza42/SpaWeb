@@ -99,6 +99,12 @@ class RegistroUsuarioForm(UserCreationForm):
             'id': 'id_username'
         })
     )
+    
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono and not telefono.isdigit():
+            raise forms.ValidationError("El teléfono debe contener solo números.")
+        return telefono
     first_name = forms.CharField(
         label="Nombre",
         widget=forms.TextInput(attrs={
@@ -124,12 +130,14 @@ class RegistroUsuarioForm(UserCreationForm):
         })
     )
     telefono = forms.CharField(
-        label="Teléfono (opcional)",
+        label="Teléfono (opcional, solo números)",
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Teléfono (opcional)',
-            'id': 'id_telefono'
+            'placeholder': 'Teléfono (opcional, solo números)',
+            'id': 'id_telefono',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*'
         })
     )
     password1 = forms.CharField(

@@ -59,7 +59,21 @@ urlpatterns = [
         name='admin_eliminar_turno'
     ),
 
-    # Django admin
+    # Panel de administración personalizado
+    path('panel-admin/', views.admin_dashboard, name='admin_dashboard'),
+    path('panel-admin/servicios/', views.admin_servicios, name='admin_servicios'),
+    path('panel-admin/turnos/', views.admin_turnos, name='admin_turnos'),
+    path('panel-admin/usuarios/', views.admin_usuarios, name='admin_usuarios'),
+    path('panel-admin/consultas/', views.admin_consultas, name='admin_consultas'),
+    
+    # PDFs de turnos
+    path('panel-admin/turnos/pdf/<int:turno_id>/', views.turno_pdf, name='turno_pdf'),
+    path('panel-admin/turnos/pdf/', views.turnos_lista_pdf, name='turnos_lista_pdf'),
+    
+    # Responder consultas
+    path('panel-admin/consultas/responder/<int:consulta_id>/', views.admin_responder_consulta, name='admin_responder_consulta'),
+    
+    # Django admin (oculto)
     path('admin/', admin.site.urls),
 
     # Autenticación

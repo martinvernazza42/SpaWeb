@@ -249,7 +249,7 @@
                     <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    <a class="nav-link" href="{% url 'admin_dashboard' %}">Panel Admin</a>
                   </li>
                 {% elif user|has_attr:"profesional" %}
                   <li class="nav-item">

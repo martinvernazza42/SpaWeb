@@ -1,0 +1,176 @@
+{% extends "admin/base_admin.html" %}
+
+{% block admin_content %}
+<div class="card mb-4">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h4><i class="fas fa-spa me-1"></i> Servicios</h4>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoServicioModal">
+        <i class="fas fa-plus"></i> Nuevo Servicio
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Subcategoría</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for servicio in servicios %}
+        <tr>
+          <td>{{ servicio.nombre }}</td>
+          <td>{{ servicio.subcategoria }}</td>
+          <td>${{ servicio.precio }}</td>
+          <td>
+            <div class="btn-group" role="group">
+              <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editarServicioModal{{ servicio.id }}">
+                <i class="fas fa-edit"></i> Editar
+              </button>
+              <a href="{% url 'admin_lista_turnos' servicio.id %}" class="btn btn-sm btn-info">
+                <i class="fas fa-calendar"></i> Turnos
+              </a>
+              <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarServicioModal{{ servicio.id }}">
+                <i class="fas fa-trash"></i> Eliminar
+              </button>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" class="text-center">No hay servicios disponibles</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal para nuevo servicio -->
+<div class="modal fade" id="nuevoServicioModal" tabindex="-1" aria-labelledby="nuevoServicioModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="nuevoServicioModalLabel">Nuevo Servicio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="#" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" required>
+          </div>
+          <div class="mb-3">
+            <label for="subcategoria" class="form-label">Subcategoría</label>
+            <select class="form-control" id="subcategoria" name="subcategoria" required>
+              {% for subcategoria in subcategorias %}
+              <option value="{{ subcategoria.id }}">{{ subcategoria }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="precio" class="form-label">Precio</label>
+            <input type="number" class="form-control" id="precio" name="precio" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="imagen" class="form-label">Imagen</label>
+            <input type="file" class="form-control" id="imagen" name="imagen">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modales para editar y eliminar servicios -->
+{% for servicio in servicios %}
+<!-- Modal para editar servicio -->
+<div class="modal fade" id="editarServicioModal{{ servicio.id }}" tabindex="-1" aria-labelledby="editarServicioModalLabel{{ servicio.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editarServicioModalLabel{{ servicio.id }}">Editar Servicio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="#" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+          <div class="mb-3">
+            <label for="nombre{{ servicio.id }}" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre{{ servicio.id }}" name="nombre" value="{{ servicio.nombre }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="subcategoria{{ servicio.id }}" class="form-label">Subcategoría</label>
+            <select class="form-control" id="subcategoria{{ servicio.id }}" name="subcategoria" required>
+              {% for subcategoria in subcategorias %}
+              <option value="{{ subcategoria.id }}" {% if subcategoria.id == servicio.subcategoria.id %}selected{% endif %}>{{ subcategoria }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="precio{{ servicio.id }}" class="form-label">Precio</label>
+            <input type="number" class="form-control" id="precio{{ servicio.id }}" name="precio" value="{{ servicio.precio }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="descripcion{{ servicio.id }}" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descripcion{{ servicio.id }}" name="descripcion" rows="3" required>{{ servicio.descripcion }}</textarea>
+          </div>
+          <div class="mb-3">
+            <label for="imagen{{ servicio.id }}" class="form-label">Imagen</label>
+            {% if servicio.imagen %}
+            <div class="mb-2">
+              <img src="{{ servicio.imagen.url }}" alt="{{ servicio.nombre }}" style="max-height: 100px;">
+            </div>
+            {% endif %}
+            <input type="file" class="form-control" id="imagen{{ servicio.id }}" name="imagen">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para eliminar servicio -->
+<div class="modal fade" id="eliminarServicioModal{{ servicio.id }}" tabindex="-1" aria-labelledby="eliminarServicioModalLabel{{ servicio.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eliminarServicioModalLabel{{ servicio.id }}">Eliminar Servicio</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar el servicio <strong>{{ servicio.nombre }}</strong>?</p>
+        <p class="text-danger">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="post" action="#">
+          {% csrf_token %}
+          <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
+          <input type="hidden" name="action" value="delete">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
