@@ -1,94 +1,124 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-<div class="container mt-5 mb-5">
+<div class="container py-5">
   <div class="row justify-content-center">
-    <div class="col-md-10">
-      <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-header bg-primary text-white rounded-top-4 text-center">
-          <h4 class="mb-0">Pago del Turno</h4>
-        </div>
-        <div class="card-body">
-          <div class="row">
-
-            <!-- Tarjeta animada -->
-            <div class="col-md-6 mb-4 mb-md-0 d-flex align-items-center justify-content-center">
-              <div id="card-wrapper" style="width: 100%; max-width: 350px;"></div>
-            </div>
-
-            <!-- Formulario -->
-            <div class="col-md-6">
-              {% if anticipado %}
-                <div class="alert alert-info text-center">
-                  Pagando con <strong>tarjeta de débito</strong> 48 hs antes del turno, obtenés <strong>15% de descuento</strong>.
-                </div>
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h2 class="mb-4">Pago online</h2>
+          
+          <div class="mb-4">
+            <h5>Detalles de tu reserva:</h5>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Servicio:</span>
+                <span class="fw-bold">{{ servicio.nombre }}</span>
+              </li>
+              {% if profesional %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Profesional:</span>
+                <span class="fw-bold">{{ profesional }}</span>
+              </li>
               {% else %}
-                <div class="alert alert-warning text-center">
-                  El turno es dentro de las próximas 48 hs. Se aplica el precio de lista.
-                </div>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Profesional:</span>
+                <span class="text-muted">Sin preferencia (se asignará automáticamente)</span>
+              </li>
               {% endif %}
-
-              <!-- Precios iniciales -->
-              <div class="text-center mb-4" id="precio-inicial">
-                <p class="mb-1">
-                  <strong>Precio base:</strong>
-                  <span class="text-muted">${{ precio_base|floatformat:"0" }}</span>
-                </p>
-                {% if anticipado %}
-                  <p>
-                    <strong>Con débito:</strong>
-                    <span class="text-success fw-bold">${{ precio_descuento|floatformat:"0" }}
-                      <small>(15% OFF)</small>
-                    </span>
-                  </p>
-                {% endif %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Fecha:</span>
+                <span class="fw-bold">{{ fecha|date:"d/m/Y" }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Hora:</span>
+                <span class="fw-bold">{{ slot.hora_inicio|time:"H:i" }} - {{ slot.hora_fin|time:"H:i" }}</span>
+              </li>
+              
+              {% if anticipado %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Precio normal:</span>
+                <span class="text-decoration-line-through">${{ precio_base }}</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                <span>Precio con descuento (15%):</span>
+                <span class="fw-bold text-success">${{ precio_descuento }}</span>
+              </li>
+              <li class="list-group-item bg-light">
+                <small class="text-muted">* Descuento por reserva anticipada con pago por débito</small>
+              </li>
+              {% else %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Precio:</span>
+                <span class="fw-bold">${{ precio_base }}</span>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+          
+          <form method="post" id="payment-form">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <h5>Método de pago:</h5>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="metodo_pago" id="credito" value="credito" checked>
+                <label class="form-check-label" for="credito">
+                  <i class="fas fa-credit-card me-2"></i> Tarjeta de crédito
+                </label>
               </div>
-
-              <!-- Precio final dinámico -->
-              <div class="text-center mb-4 d-none" id="precio-final">
-                <p class="mb-0">
-                  <strong>Precio final:</strong>
-                  <span id="precio-final-monto" class="fw-bold text-dark"></span>
-                </p>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="metodo_pago" id="debito" value="debito">
+                <label class="form-check-label" for="debito">
+                  <i class="fas fa-money-check me-2"></i> Tarjeta de débito
+                  {% if anticipado %}
+                  <span class="badge bg-success ms-2">15% OFF</span>
+                  {% endif %}
+                </label>
               </div>
-
-              <form method="post" autocomplete="off">
-                {% csrf_token %}
-
-                <div class="mb-3">
-                  <label for="metodo_pago" class="form-label">Método de Pago</label>
-                  <select class="form-select" name="metodo_pago" id="metodo_pago" required>
-                    <option value="">Seleccionar método</option>
-                    <option value="debito">Tarjeta de débito</option>
-                    <option value="credito">Tarjeta de crédito</option>
-                  </select>
-                </div>
-
-                <div class="mb-3">
-                  <label for="nombre_tarjeta" class="form-label">Nombre en la tarjeta</label>
-                  <input type="text" class="form-control" id="nombre_tarjeta" name="nombre_tarjeta" required disabled>
-                </div>
-
-                <div class="mb-3">
-                  <label for="numero_tarjeta" class="form-label">Número de tarjeta</label>
-                  <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" maxlength="16" required disabled>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="vencimiento" class="form-label">Vencimiento (MM/AA)</label>
-                    <input type="text" class="form-control" id="vencimiento" name="vencimiento" placeholder="MM/AA" required disabled>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label for="codigo_seguridad" class="form-label">Código de seguridad</label>
-                    <input type="password" class="form-control" id="codigo_seguridad" name="codigo_seguridad" maxlength="4" required disabled>
-                  </div>
-                </div>
-
-                <button type="submit" class="btn btn-success w-100 mt-3">Pagar</button>
-              </form>
             </div>
-
+            
+            <div class="mb-3">
+              <label for="numero_tarjeta" class="form-label">Número de tarjeta</label>
+              <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" 
+                     placeholder="1234 5678 9012 3456" required
+                     pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                     maxlength="19">
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
+                <input type="text" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" 
+                       placeholder="MM/AA" required
+                       pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
+                       maxlength="5">
+              </div>
+              <div class="col-md-6">
+                <label for="codigo_seguridad" class="form-label">Código de seguridad</label>
+                <input type="text" class="form-control" id="codigo_seguridad" name="codigo_seguridad" 
+                       placeholder="123" required
+                       pattern="[0-9]{3,4}"
+                       maxlength="4">
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="nombre_titular" class="form-label">Nombre del titular</label>
+              <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
+                     placeholder="Como aparece en la tarjeta" required>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary py-3">
+                <i class="fas fa-lock me-2"></i> Pagar ahora
+              </button>
+            </div>
+          </form>
+          
+          <div class="mt-3 text-center">
+            <a href="{% url 'elegir_pago' servicio.id fecha|date:'Y-m-d' slot.id %}" class="text-secondary">
+              <i class="fas fa-arrow-left me-1"></i> Volver
+            </a>
           </div>
         </div>
       </div>
@@ -96,63 +126,79 @@
   </div>
 </div>
 
-<!-- Card.js y jQuery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/card.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/card/2.5.4/card.min.css" />
-
 <script>
-  new Card({
-    form: 'form',
-    container: '#card-wrapper',
-    formSelectors: {
-      numberInput: 'input[name="numero_tarjeta"]',
-      expiryInput: 'input[name="vencimiento"]',
-      cvcInput: 'input[name="codigo_seguridad"]',
-      nameInput: 'input[name="nombre_tarjeta"]'
-    },
-    width: 300,
-    formatting: true,
-    placeholders: {
-      number: '•••• •••• •••• ••••',
-      name: '',
-      expiry: '••/••',
-      cvc: '•••'
-    }
-  });
-
-  document.addEventListener("DOMContentLoaded", function () {
-    const metodoSelect = document.getElementById("metodo_pago");
-    const campos = [
-      document.getElementById("nombre_tarjeta"),
-      document.getElementById("numero_tarjeta"),
-      document.getElementById("vencimiento"),
-      document.getElementById("codigo_seguridad")
-    ];
-
-    const precioFinalDiv = document.getElementById("precio-final");
-    const precioInicialDiv = document.getElementById("precio-inicial");
-    const precioFinalMonto = document.getElementById("precio-final-monto");
-
-    const precioBase = parseFloat("{{ precio_base|floatformat:'0' }}");
-    const precioDescuento = parseFloat("{{ precio_descuento|default_if_none:precio_base|floatformat:'0' }}");
-    const anticipado = "{{ anticipado|yesno:'true,false' }}" === "true";
-
-    metodoSelect.addEventListener("change", function () {
-      const metodo = this.value;
-
-      // Habilitar campos
-      campos.forEach(campo => campo.disabled = false);
-
-      // Mostrar precio final
-      if (anticipado && metodo === "debito") {
-        precioFinalMonto.textContent = "$" + precioDescuento;
-      } else {
-        precioFinalMonto.textContent = "$" + precioBase;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Formatear número de tarjeta
+    const numeroTarjeta = document.getElementById('numero_tarjeta');
+    numeroTarjeta.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 16) value = value.slice(0, 16);
+      
+      // Formatear con espacios cada 4 dígitos
+      let formattedValue = '';
+      for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) formattedValue += ' ';
+        formattedValue += value[i];
       }
-
-      precioInicialDiv.classList.add("d-none");
-      precioFinalDiv.classList.remove("d-none");
+      
+      e.target.value = formattedValue;
+    });
+    
+    // Formatear fecha de vencimiento
+    const fechaVencimiento = document.getElementById('fecha_vencimiento');
+    fechaVencimiento.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 4) value = value.slice(0, 4);
+      
+      // Formatear como MM/AA
+      if (value.length > 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2);
+      }
+      
+      e.target.value = value;
+    });
+    
+    // Permitir solo números en código de seguridad
+    const codigoSeguridad = document.getElementById('codigo_seguridad');
+    codigoSeguridad.addEventListener('input', function(e) {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    });
+    
+    // Validación del formulario
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(e) {
+      let isValid = true;
+      
+      // Validar número de tarjeta
+      const cardNumber = numeroTarjeta.value.replace(/\s/g, '');
+      if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+        numeroTarjeta.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        numeroTarjeta.classList.remove('is-invalid');
+      }
+      
+      // Validar fecha de vencimiento
+      const expDate = fechaVencimiento.value;
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expDate)) {
+        fechaVencimiento.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        fechaVencimiento.classList.remove('is-invalid');
+      }
+      
+      // Validar código de seguridad
+      const cvv = codigoSeguridad.value;
+      if (!/^\d{3,4}$/.test(cvv)) {
+        codigoSeguridad.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        codigoSeguridad.classList.remove('is-invalid');
+      }
+      
+      if (!isValid) {
+        e.preventDefault();
+      }
     });
   });
 </script>

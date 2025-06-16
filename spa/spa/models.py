@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 # MODELOS PARA CATEGORÍAS Y SUBCATEGORÍAS
 class CategoriaServicio(models.Model):
@@ -45,14 +46,26 @@ class Cliente(models.Model):
         return self.user.get_full_name() or self.user.username
 
 
+# Definición de Profesional antes de Turno
+class Profesional(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profesional')
+    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='profesionales')
+
+    def __str__(self):
+        return self.user.get_full_name() or self.user.username
+
+
 class Turno(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    profesional = models.ForeignKey(Profesional, on_delete=models.SET_NULL, null=True, blank=True, related_name='turnos')
     fecha = models.DateField()
     hora = models.TimeField()
+    comentario = models.TextField(blank=True, null=True, help_text="Comentarios sobre el turno")
 
     def __str__(self):
-        return f"{self.cliente} - {self.servicio} - {self.fecha} {self.hora}"
+        profesional_str = f" con {self.profesional}" if self.profesional else ""
+        return f"{self.cliente} - {self.servicio}{profesional_str} - {self.fecha} {self.hora}"
 
 
 class Disponibilidad(models.Model):
@@ -81,8 +94,6 @@ class Consulta(models.Model):
 # -------------------------------------------
 # Modelos de carrito de compras
 # -------------------------------------------
-from django.conf import settings
-
 class Cart(models.Model):
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,
                                     null=True, blank=True,
@@ -100,14 +111,3 @@ class CartItem(models.Model):
 
     class Meta:
         unique_together = ('cart','servicio','fecha','hora')
-
-
-# -------------------------------------------
-# Modelo Profesional agregado
-# -------------------------------------------
-class Profesional(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profesional')
-    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE, related_name='profesionales')
-
-    def __str__(self):
-        return self.user.get_full_name() or self.user.username

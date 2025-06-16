@@ -3,26 +3,61 @@
 <style>
   /* Oculta elementos no relevantes en la impresión */
   @media print {
-    /* ya tenías esto: */
     nav,
     #chat-toggle,
     .btn-print,
     .offcanvas {
       display: none !important;
     }
-    /* añade esto para quitar el banner completo */
     #background-container {
       display: none !important;
     }
-    /* Opcional: reajusta márgenes si hiciera falta */
     body {
       margin: 0; padding: 0;
     }
   }
+  
+  .card-header-pink {
+    background-color: #ff66b2;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .card-header-today {
+    background-color: #ff3399;
+    color: white;
+    padding: 15px;
+    border-radius: 5px 5px 0 0;
+    font-weight: bold;
+  }
+  
+  .today-card {
+    border: 2px solid #ff3399;
+    border-radius: 6px;
+    margin-bottom: 25px;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #ff66b2;
+  }
+  
+  .nav-pills .nav-link {
+    color: #333;
+  }
 </style>
 
 <div class="container py-5">
-  <!-- resto igual: header de turnos y tabla -->
+  <!-- Pestañas de navegación -->
+  <ul class="nav nav-pills mb-4">
+    <li class="nav-item">
+      <a class="nav-link active" href="{% url 'mis_turnos' %}">Turnos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'historial_clientes' %}">Historial de Clientes</a>
+    </li>
+  </ul>
+
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Turnos: {{ servicio.nombre }}</h2>
     <button
@@ -33,35 +68,81 @@
       <i class="fa-solid fa-print me-1"></i>Imprimir
     </button>
   </div>
-  <div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table mb-0">
-          <thead style="background-color: #ff66b2; color: #fff;">
-            <tr>
-              <th class="text-center">#</th>
-              <th>Cliente</th>
-              <th class="text-center">Fecha</th>
-              <th class="text-center">Hora</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for turno in turnos %}
-              <tr class="{% cycle '' 'table-active' %}">
-                <td class="text-center">{{ forloop.counter }}</td>
-                <td>{{ turno.cliente.user.get_full_name }}</td>
-                <td class="text-center">{{ turno.fecha|date:"d/m/Y" }}</td>
-                <td class="text-center">{{ turno.hora|time:"H:i" }}</td>
-              </tr>
-            {% empty %}
+  
+  <!-- Turnos de hoy -->
+  <div class="today-card shadow">
+    <div class="card-header-today">
+      <h3 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Turnos de Hoy - {{ hoy|date:"d/m/Y" }}</h3>
+    </div>
+    <div class="card-body">
+      {% if turnos_hoy %}
+        <div class="table-responsive">
+          <table class="table mb-0">
+            <thead>
               <tr>
-                <td colspan="4" class="text-center py-4 text-muted">
-                  No hay turnos programados para esta semana.
-                </td>
+                <th class="text-center">#</th>
+                <th>Cliente</th>
+                <th class="text-center">Hora</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for turno in turnos_hoy %}
+                <tr>
+                  <td class="text-center">{{ forloop.counter }}</td>
+                  <td>{{ turno.cliente.user.get_full_name }}</td>
+                  <td class="text-center"><strong>{{ turno.hora|time:"H:i" }}</strong></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-4">
+          <i class="fas fa-calendar-check text-muted" style="font-size: 3rem;"></i>
+          <p class="mt-3 mb-0 text-muted">No tienes turnos programados para hoy.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  
+  <div class="row">
+    <!-- Columna de turnos próximos -->
+    <div class="col-md-12">
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header-pink">
+          <h4 class="mb-0">Turnos Próximos</h4>
+          <small>A partir de mañana</small>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0">
+              <thead style="background-color: #ff66b2; color: #fff;">
+                <tr>
+                  <th class="text-center">#</th>
+                  <th>Cliente</th>
+                  <th class="text-center">Fecha</th>
+                  <th class="text-center">Hora</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for turno in turnos_proximos %}
+                  <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ turno.cliente.user.get_full_name }}</td>
+                    <td class="text-center">{{ turno.fecha|date:"d/m/Y" }}</td>
+                    <td class="text-center">{{ turno.hora|time:"H:i" }}</td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">
+                      No hay turnos próximos programados.
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>

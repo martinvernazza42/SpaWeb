@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+  .cliente-list {
+    height: calc(100vh - 250px);
+    overflow-y: auto;
+    border-right: 1px solid #eee;
+  }
+  .cliente-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .cliente-item:hover {
+    background-color: #f8f9fa;
+  }
+  .cliente-item.active {
+    background-color: #ff66b2;
+    color: white;
+  }
+  .comentario-form {
+    display: none;
+    margin-top: 10px;
+  }
+  .btn-comentario {
+    cursor: pointer;
+  }
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    .print-only {
+      display: block !important;
+    }
+  }
+  .print-only {
+    display: none;
+  }
+  
+  .nav-pills .nav-link.active {
+    background-color: #ff66b2;
+  }
+  
+  .nav-pills .nav-link {
+    color: #333;
+  }
+</style>
+
+<div class="container-fluid py-5">
+  <!-- Pestañas de navegación -->
+  <ul class="nav nav-pills mb-4">
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'mis_turnos' %}">Turnos</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="{% url 'historial_clientes' %}">Historial de Clientes</a>
+    </li>
+  </ul>
+
+  <div class="row">
+    <!-- Columna de clientes -->
+    <div class="col-md-3 no-print">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Clientes</h5>
+        </div>
+        <div class="card-body p-0 cliente-list">
+          {% for cliente in clientes %}
+            <div class="cliente-item {% if cliente_seleccionado.id == cliente.id %}active{% endif %}" 
+                 onclick="window.location.href='{% url 'historial_clientes' %}?cliente_id={{ cliente.id }}'">
+              <strong>{{ cliente.user.last_name }}, {{ cliente.user.first_name }}</strong>
+              <div class="small text-muted">{{ cliente.user.email }}</div>
+            </div>
+          {% empty %}
+            <div class="p-3 text-center text-muted">
+              No hay clientes con turnos registrados
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Columna de historial -->
+    <div class="col-md-9">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          {% if cliente_seleccionado %}
+            <h5 class="mb-0">Historial de {{ cliente_seleccionado.user.get_full_name }}</h5>
+            <div>
+              <a href="{% url 'historial_cliente_pdf' cliente_seleccionado.id %}" class="btn btn-danger no-print" target="_blank">
+                <i class="fas fa-file-pdf"></i> Imprimir Historial
+              </a>
+              <button onclick="window.print()" class="btn btn-secondary no-print">
+                <i class="fas fa-print"></i> Imprimir esta página
+              </button>
+            </div>
+          {% else %}
+            <h5 class="mb-0">Historial de Clientes</h5>
+          {% endif %}
+        </div>
+        
+        <div class="card-body">
+          {% if cliente_seleccionado %}
+            <!-- Información del cliente para impresión -->
+            <div class="print-only mb-4">
+              <h3>Historial de Turnos - {{ cliente_seleccionado.user.get_full_name }}</h3>
+              <p>Email: {{ cliente_seleccionado.user.email }}</p>
+              <p>Teléfono: {{ cliente_seleccionado.telefono }}</p>
+              <p>Fecha de impresión: {% now "d/m/Y H:i" %}</p>
+              <hr>
+            </div>
+            
+            {% if turnos_cliente %}
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Servicio</th>
+                      <th class="no-print">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for turno in turnos_cliente %}
+                      <tr>
+                        <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+                        <td>{{ turno.hora|time:"H:i" }}</td>
+                        <td>{{ turno.servicio.nombre }}</td>
+                        <td class="no-print">
+                          <button class="btn btn-sm btn-outline-primary btn-comentario" 
+                                  onclick="toggleComentario('comentario-{{ turno.id }}')">
+                            {% if turno.comentario %}
+                              <i class="fas fa-edit"></i> Editar comentario
+                            {% else %}
+                              <i class="fas fa-plus"></i> Agregar comentario
+                            {% endif %}
+                          </button>
+                          
+                          <div id="comentario-{{ turno.id }}" class="comentario-form">
+                            <form method="post" action="{% url 'guardar_comentario_turno' turno.id %}">
+                              {% csrf_token %}
+                              <div class="input-group">
+                                <textarea name="comentario" class="form-control" rows="2" 
+                                          placeholder="Escriba un comentario sobre este turno">{{ turno.comentario|default:'' }}</textarea>
+                                <button type="submit" class="btn btn-primary">
+                                  <i class="fas fa-save"></i> Guardar
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        </td>
+                      </tr>
+                      {% if turno.comentario %}
+                        <tr>
+                          <td colspan="4" class="bg-light">
+                            <strong>Comentario:</strong> {{ turno.comentario }}
+                          </td>
+                        </tr>
+                      {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="alert alert-info">
+                No hay turnos registrados para este cliente.
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="text-center py-5">
+              <i class="fas fa-users fa-3x text-muted mb-3"></i>
+              <p class="lead">Selecciona un cliente para ver su historial de turnos</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleComentario(id) {
+    const comentarioForm = document.getElementById(id);
+    if (comentarioForm.style.display === 'block') {
+      comentarioForm.style.display = 'none';
+    } else {
+      // Ocultar todos los formularios de comentarios
+      document.querySelectorAll('.comentario-form').forEach(form => {
+        form.style.display = 'none';
+      });
+      // Mostrar solo el seleccionado
+      comentarioForm.style.display = 'block';
+    }
+  }
+</script>
+{% endblock %}

@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+{% block content %}
 <div class="container mt-5 mb-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -23,14 +24,14 @@
             <li class="list-group-item">
               <strong>Correo electrónico:</strong> {{ user.email }}
             </li>
+            {% if user.cliente.telefono %}
             <li class="list-group-item">
               <strong>Teléfono:</strong> {{ user.cliente.telefono }}
             </li>
+            {% endif %}
           </ul>
           <div class="d-grid gap-2 mt-4">
-            <a href="{% url 'logout' %}" class="btn btn-secondary"
-              >Cerrar sesión</a
-            >
+            <a href="{% url 'logout' %}" class="btn btn-secondary">Cerrar sesión</a>
           </div>
         </div>
       </div>
@@ -81,4 +82,5 @@
     </div>
   </div>
 </div>
-{% include 'footer.html' %} {% endblock %}
+{% include 'footer.html' %} 
+{% endblock %}

@@ -73,6 +73,11 @@ urlpatterns = [
     # Responder consultas
     path('panel-admin/consultas/responder/<int:consulta_id>/', views.admin_responder_consulta, name='admin_responder_consulta'),
     
+    # Historial de clientes para profesionales
+    path('historial-clientes/', views.historial_clientes, name='historial_clientes'),
+    path('historial-clientes/pdf/<int:cliente_id>/', views.historial_cliente_pdf, name='historial_cliente_pdf'),
+    path('guardar-comentario/<int:turno_id>/', views.guardar_comentario_turno, name='guardar_comentario_turno'),
+    
     # Django admin (oculto)
     path('admin/', admin.site.urls),
 

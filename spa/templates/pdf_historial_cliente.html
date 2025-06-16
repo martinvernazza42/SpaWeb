@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Cliente</title>
+    <style>
+        @page {
+            size: a4 portrait;
+            margin: 1cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #ff66b2;
+            margin-bottom: 5px;
+        }
+        .header p {
+            color: #666;
+            margin-top: 0;
+        }
+        .cliente-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .comentario {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin-top: 5px;
+            border-left: 3px solid #ff66b2;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Spa Bienestar</h1>
+        <p>Historial de Cliente</p>
+    </div>
+    
+    <div class="cliente-info">
+        <h2>{{ cliente.user.get_full_name }}</h2>
+        <p><strong>Email:</strong> {{ cliente.user.email }}</p>
+        {% if cliente.telefono %}
+        <p><strong>Teléfono:</strong> {{ cliente.telefono }}</p>
+        {% endif %}
+    </div>
+    
+    <h3>Historial de Turnos</h3>
+    
+    {% if turnos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Servicio</th>
+                <th>Profesional</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for turno in turnos %}
+            <tr>
+                <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+                <td>{{ turno.hora|time:"H:i" }}</td>
+                <td>{{ turno.servicio.nombre }}</td>
+                <td>{{ turno.profesional|default:"No asignado" }}</td>
+            </tr>
+            {% if turno.comentario %}
+            <tr>
+                <td colspan="4" class="comentario">
+                    <strong>Comentario:</strong> {{ turno.comentario }}
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay turnos registrados para este cliente.</p>
+    {% endif %}
+    
+    <div class="footer">
+        <p>Total de turnos: {{ turnos|length }}</p>
+        <p>Fecha de impresión: {% now "d/m/Y H:i" %}</p>
+    </div>
+</body>
+</html>

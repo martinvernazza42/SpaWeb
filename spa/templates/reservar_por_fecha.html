@@ -25,6 +25,14 @@
       padding: .25rem .5rem;
       font-size: .875rem;
     }
+    .profesional-select {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
   </style>
 
   <div class="container mt-5" style="max-width: 500px;">
@@ -59,6 +67,32 @@
                 </a>
               {% endif %}
             </div>
+          {% endfor %}
+        </div>
+
+        <!-- Selección de profesional -->
+        <div class="profesional-select">
+          <h5>Seleccionar profesional (opcional)</h5>
+          <p class="text-muted small">Puedes elegir un profesional específico o dejarlo sin seleccionar para que se asigne automáticamente.</p>
+          
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="profesional_id" id="sin_preferencia" value="" checked>
+            <label class="form-check-label" for="sin_preferencia">
+              Sin preferencia - Cualquier profesional disponible
+            </label>
+          </div>
+          
+          {% for profesional in profesionales %}
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="radio" name="profesional_id" id="profesional_{{ profesional.id }}" value="{{ profesional.id }}">
+            <label class="form-check-label" for="profesional_{{ profesional.id }}">
+              {{ profesional.user.get_full_name }}
+            </label>
+          </div>
+          {% empty %}
+          <div class="text-muted">
+            No hay profesionales asignados a este servicio.
+          </div>
           {% endfor %}
         </div>
 
