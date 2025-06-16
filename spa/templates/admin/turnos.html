@@ -96,7 +96,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" action="#">
+        <form method="post">
           {% csrf_token %}
           <div class="mb-3">
             <label for="cliente" class="form-label">Cliente</label>
@@ -143,7 +143,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" action="#">
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="turno_id" value="{{ turno.id }}">
           <div class="mb-3">
@@ -194,7 +194,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="post" action="#">
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="turno_id" value="{{ turno.id }}">
           <input type="hidden" name="action" value="delete">

@@ -278,6 +278,73 @@ def admin_servicios(request):
     servicios = Servicio.objects.all().order_by('subcategoria__nombre', 'nombre')
     subcategorias = SubcategoriaServicio.objects.all()
     
+    if request.method == 'POST':
+        servicio_id = request.POST.get('servicio_id')
+        action = request.POST.get('action')
+        
+        # Eliminar servicio
+        if action == 'delete' and servicio_id:
+            servicio = get_object_or_404(Servicio, pk=servicio_id)
+            servicio.delete()
+            messages.success(request, f"El servicio '{servicio.nombre}' ha sido eliminado.")
+            return redirect('admin_servicios')
+        
+        # Editar servicio
+        if servicio_id:
+            servicio = get_object_or_404(Servicio, pk=servicio_id)
+            nombre = request.POST.get('nombre')
+            descripcion = request.POST.get('descripcion')
+            precio = request.POST.get('precio')
+            subcategoria_id = request.POST.get('subcategoria')
+            
+            if nombre and descripcion and precio and subcategoria_id:
+                try:
+                    subcategoria = get_object_or_404(SubcategoriaServicio, pk=subcategoria_id)
+                    
+                    servicio.nombre = nombre
+                    servicio.descripcion = descripcion
+                    servicio.precio = precio
+                    servicio.subcategoria = subcategoria
+                    
+                    # Manejar la imagen si se proporciona una nueva
+                    if 'imagen' in request.FILES:
+                        servicio.imagen = request.FILES['imagen']
+                    
+                    servicio.save()
+                    messages.success(request, f"El servicio '{nombre}' ha sido actualizado.")
+                except Exception as e:
+                    messages.error(request, f"Error al actualizar el servicio: {str(e)}")
+                
+                return redirect('admin_servicios')
+        
+        # Crear nuevo servicio
+        if 'action' not in request.POST:
+            nombre = request.POST.get('nombre')
+            descripcion = request.POST.get('descripcion')
+            precio = request.POST.get('precio')
+            subcategoria_id = request.POST.get('subcategoria')
+            
+            if nombre and descripcion and precio and subcategoria_id:
+                try:
+                    subcategoria = get_object_or_404(SubcategoriaServicio, pk=subcategoria_id)
+                    
+                    servicio = Servicio(
+                        nombre=nombre,
+                        descripcion=descripcion,
+                        precio=precio,
+                        subcategoria=subcategoria
+                    )
+                    
+                    if 'imagen' in request.FILES:
+                        servicio.imagen = request.FILES['imagen']
+                    
+                    servicio.save()
+                    messages.success(request, f"El servicio '{nombre}' ha sido creado.")
+                except Exception as e:
+                    messages.error(request, f"Error al crear el servicio: {str(e)}")
+                
+                return redirect('admin_servicios')
+    
     return render(request, 'admin/servicios.html', {
         'servicios': servicios,
         'subcategorias': subcategorias,
@@ -292,6 +359,45 @@ from .utils import render_to_pdf
 @staff_member_required
 def admin_turnos(request):
     hoy = timezone.now().date()
+    
+    # Procesar formularios POST (editar o eliminar turno)
+    if request.method == 'POST':
+        turno_id = request.POST.get('turno_id')
+        action = request.POST.get('action')
+        
+        if turno_id:
+            turno = get_object_or_404(Turno, pk=turno_id)
+            
+            # Eliminar turno
+            if action == 'delete':
+                turno.delete()
+                messages.success(request, "El turno ha sido eliminado correctamente.")
+                return redirect('admin_turnos')
+            
+            # Editar turno
+            cliente_id = request.POST.get('cliente')
+            servicio_id = request.POST.get('servicio')
+            fecha_str = request.POST.get('fecha')
+            hora_str = request.POST.get('hora')
+            
+            if cliente_id and servicio_id and fecha_str and hora_str:
+                try:
+                    cliente = get_object_or_404(Cliente, pk=cliente_id)
+                    servicio = get_object_or_404(Servicio, pk=servicio_id)
+                    fecha = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+                    hora = datetime.strptime(hora_str, '%H:%M').time()
+                    
+                    turno.cliente = cliente
+                    turno.servicio = servicio
+                    turno.fecha = fecha
+                    turno.hora = hora
+                    turno.save()
+                    
+                    messages.success(request, "El turno ha sido actualizado correctamente.")
+                except Exception as e:
+                    messages.error(request, f"Error al actualizar el turno: {str(e)}")
+                
+                return redirect('admin_turnos')
     
     # Obtener fechas del filtro
     fecha_desde = request.GET.get('fecha_desde')
@@ -378,6 +484,21 @@ def admin_usuarios(request):
     
     if request.method == 'POST':
         usuario_id = request.POST.get('usuario_id')
+        action = request.POST.get('action')
+        
+        # Eliminar usuario
+        if usuario_id and action == 'delete':
+            usuario = get_object_or_404(User, pk=usuario_id)
+            # No permitir eliminar al usuario actual
+            if usuario != request.user:
+                username = usuario.username
+                usuario.delete()
+                messages.success(request, f"El usuario {username} ha sido eliminado.")
+            else:
+                messages.error(request, "No puedes eliminar tu propio usuario.")
+            return redirect('admin_usuarios')
+        
+        # Cambiar rol de usuario
         tipo = request.POST.get('tipo')
         servicio_id = request.POST.get('servicio')
         

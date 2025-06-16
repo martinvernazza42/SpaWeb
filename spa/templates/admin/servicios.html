@@ -59,7 +59,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" action="#" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="mb-3">
             <label for="nombre" class="form-label">Nombre</label>
@@ -106,7 +106,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form method="post" action="#" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
           <div class="mb-3">
@@ -137,6 +137,7 @@
             </div>
             {% endif %}
             <input type="file" class="form-control" id="imagen{{ servicio.id }}" name="imagen">
+            <small class="form-text text-muted">Deja este campo vacío si no quieres cambiar la imagen</small>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -162,7 +163,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <form method="post" action="#">
+        <form method="post">
           {% csrf_token %}
           <input type="hidden" name="servicio_id" value="{{ servicio.id }}">
           <input type="hidden" name="action" value="delete">

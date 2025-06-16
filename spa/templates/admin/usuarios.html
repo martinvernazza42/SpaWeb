@@ -52,9 +52,6 @@
               <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#cambiarRolModal{{ usuario.id }}">
                 <i class="fas fa-user-tag"></i> Cambiar Rol
               </button>
-              <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#editarUsuarioModal{{ usuario.id }}">
-                <i class="fas fa-edit"></i> Editar
-              </button>
               <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarUsuarioModal{{ usuario.id }}">
                 <i class="fas fa-trash"></i> Eliminar
               </button>
@@ -112,6 +109,31 @@
   </div>
 </div>
 
+<!-- Modal para eliminar usuario -->
+<div class="modal fade" id="eliminarUsuarioModal{{ usuario.id }}" tabindex="-1" aria-labelledby="eliminarUsuarioModalLabel{{ usuario.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eliminarUsuarioModalLabel{{ usuario.id }}">Eliminar Usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar al usuario <strong>{{ usuario.username }}</strong>?</p>
+        <p class="text-danger">Esta acción no se puede deshacer y eliminará todos los datos asociados a este usuario.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="usuario_id" value="{{ usuario.id }}">
+          <input type="hidden" name="action" value="delete">
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Script para mostrar/ocultar campo de servicio según el rol -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -128,9 +150,6 @@
   });
 </script>
 {% endfor %}
-
-<!-- Resto de modales (editar, eliminar, nuevo usuario) -->
-<!-- ... -->
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
