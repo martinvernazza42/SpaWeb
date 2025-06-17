@@ -86,9 +86,15 @@ class Consulta(models.Model):
     nombre = models.CharField(max_length=100)
     email = models.EmailField()
     mensaje = models.TextField()
+    servicio = models.ForeignKey(Servicio, on_delete=models.SET_NULL, null=True, blank=True, related_name='consultas')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    respondida = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - {self.servicio.nombre if self.servicio else 'Sin servicio'}"
+        
+    class Meta:
+        ordering = ['-fecha_creacion']
 
 
 # -------------------------------------------
@@ -103,11 +109,12 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    cart     = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    servicio = models.ForeignKey(Servicio, on_delete=models.CASCADE)
-    fecha    = models.DateField()
-    hora     = models.TimeField()
-    hora_fin = models.TimeField()
+    cart       = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
+    servicio   = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    fecha      = models.DateField()
+    hora       = models.TimeField()
+    hora_fin   = models.TimeField()
+    profesional = models.ForeignKey(Profesional, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         unique_together = ('cart','servicio','fecha','hora')

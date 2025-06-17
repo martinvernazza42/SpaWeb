@@ -6,8 +6,8 @@
             <div class="col-md-6">
                 <div class="card shadow-sm border-light">
                     <div class="card-header text-center bg-pink text-white">
-                        <h3 class="text-black">Consulta</h3> <!-- Cambio de color a negro -->
-                        <p class="text-black">¡Estamos aquí para ayudarte! Completa el formulario y nos pondremos en contacto contigo.</p> <!-- Cambio de color a negro -->
+                        <h3 class="text-black">Consulta</h3>
+                        <p class="text-black">¡Estamos aquí para ayudarte! Completa el formulario y nos pondremos en contacto contigo.</p>
                     </div>
                     <div class="card-body">
                         <!-- Mostrar mensajes de éxito -->
@@ -24,6 +24,8 @@
 
                         <form method="post">
                             {% csrf_token %}
+                            
+                            {% if not user_authenticated %}
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre completo</label>
                                 <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Tu nombre" required>
@@ -31,6 +33,17 @@
                             <div class="mb-3">
                                 <label for="email" class="form-label">Correo electrónico</label>
                                 <input type="email" class="form-control" id="email" name="email" placeholder="Tu correo" required>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="mb-3">
+                                <label for="servicio" class="form-label">Servicio de interés</label>
+                                <select class="form-select" id="servicio" name="servicio_id">
+                                    <option value="">Selecciona un servicio</option>
+                                    {% for servicio in servicios %}
+                                        <option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label for="mensaje" class="form-label">Mensaje</label>

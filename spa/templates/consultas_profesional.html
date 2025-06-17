@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <h2 class="mb-4">Consultas de {{ servicio.nombre }}</h2>
+    
+    <div class="card shadow-sm border-light mb-4">
+        <div class="card-header bg-pink">
+            <h4 class="text-black mb-0">Consultas pendientes</h4>
+        </div>
+        <div class="card-body">
+            {% if consultas_pendientes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Mensaje</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in consultas_pendientes %}
+                                <tr>
+                                    <td>{{ consulta.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ consulta.nombre }}</td>
+                                    <td>{{ consulta.email }}</td>
+                                    <td>{{ consulta.mensaje }}</td>
+                                    <td>
+                                        <a href="{% url 'responder_consulta' consulta.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-reply"></i> Responder
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No hay consultas pendientes para este servicio.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="card shadow-sm border-light">
+        <div class="card-header bg-light">
+            <h4 class="mb-0">Consultas respondidas</h4>
+        </div>
+        <div class="card-body">
+            {% if consultas_respondidas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for consulta in consultas_respondidas %}
+                                <tr>
+                                    <td>{{ consulta.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ consulta.nombre }}</td>
+                                    <td>{{ consulta.email }}</td>
+                                    <td>{{ consulta.mensaje }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No hay consultas respondidas para este servicio.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

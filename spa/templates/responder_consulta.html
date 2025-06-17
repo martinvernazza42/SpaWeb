@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-light">
+                <div class="card-header bg-pink">
+                    <h3 class="text-black mb-0">Responder consulta</h3>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5>Detalles de la consulta:</h5>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <p><strong>Fecha:</strong> {{ consulta.fecha_creacion|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Nombre:</strong> {{ consulta.nombre }}</p>
+                                <p><strong>Email:</strong> {{ consulta.email }}</p>
+                                <p><strong>Servicio:</strong> {{ consulta.servicio.nombre }}</p>
+                                <p><strong>Mensaje:</strong></p>
+                                <div class="p-3 bg-white rounded">
+                                    {{ consulta.mensaje }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label">Asunto</label>
+                            <input type="text" class="form-control" id="asunto" name="asunto" 
+                                   value="Re: Consulta sobre {{ consulta.servicio.nombre }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">Mensaje</label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="6" required>Hola {{ consulta.nombre }},
+
+Gracias por tu consulta sobre {{ consulta.servicio.nombre }}.
+
+[Tu respuesta aquí]
+
+Saludos cordiales,
+{{ user.get_full_name }}
+{{ servicio.nombre }} - Spa Bienestar</textarea>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'consultas_profesional' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Enviar respuesta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

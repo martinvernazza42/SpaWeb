@@ -6,7 +6,8 @@
     nav,
     #chat-toggle,
     .btn-print,
-    .offcanvas {
+    .offcanvas,
+    .no-print {
       display: none !important;
     }
     #background-container {
@@ -15,6 +16,16 @@
     body {
       margin: 0; padding: 0;
     }
+    .print-only {
+      display: block !important;
+    }
+    .print-break-after {
+      page-break-after: always;
+    }
+  }
+  
+  .print-only {
+    display: none;
   }
   
   .card-header-pink {
@@ -45,11 +56,15 @@
   .nav-pills .nav-link {
     color: #333;
   }
+  
+  .dropdown-menu {
+    min-width: 200px;
+  }
 </style>
 
 <div class="container py-5">
   <!-- Pestañas de navegación -->
-  <ul class="nav nav-pills mb-4">
+  <ul class="nav nav-pills mb-4 no-print">
     <li class="nav-item">
       <a class="nav-link active" href="{% url 'mis_turnos' %}">Turnos</a>
     </li>
@@ -60,17 +75,37 @@
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold">Turnos: {{ servicio.nombre }}</h2>
-    <button
-      type="button"
-      class="btn-pink btn-print"
-      onclick="window.print()"
-    >
-      <i class="fa-solid fa-print me-1"></i>Imprimir
-    </button>
+    <div class="dropdown no-print">
+      <button class="btn-pink dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-print me-1"></i> Opciones de impresión
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+        <li><button class="dropdown-item" onclick="imprimirTurnosHoy()">
+          <i class="fas fa-calendar-day me-2"></i> Imprimir turnos de hoy
+        </button></li>
+        <li><button class="dropdown-item" onclick="imprimirTurnosProximos()">
+          <i class="fas fa-calendar-alt me-2"></i> Imprimir turnos próximos
+        </button></li>
+        <li><button class="dropdown-item" onclick="imprimirTodosTurnos()">
+          <i class="fas fa-calendar-check me-2"></i> Imprimir todos los turnos
+        </button></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'turnos_lista_pdf' %}" target="_blank">
+          <i class="fas fa-file-pdf me-2"></i> Descargar PDF completo
+        </a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- Información para impresión -->
+  <div class="print-only mb-4" id="print-header">
+    <h2 class="text-center">{{ servicio.nombre }} - Agenda de Turnos</h2>
+    <p class="text-center">Fecha de impresión: {% now "d/m/Y H:i" %}</p>
+    <hr>
   </div>
   
   <!-- Turnos de hoy -->
-  <div class="today-card shadow">
+  <div class="today-card shadow" id="turnos-hoy">
     <div class="card-header-today">
       <h3 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Turnos de Hoy - {{ hoy|date:"d/m/Y" }}</h3>
     </div>
@@ -108,7 +143,7 @@
   <div class="row">
     <!-- Columna de turnos próximos -->
     <div class="col-md-12">
-      <div class="card shadow-sm border-0 mb-4">
+      <div class="card shadow-sm border-0 mb-4" id="turnos-proximos">
         <div class="card-header-pink">
           <h4 class="mb-0">Turnos Próximos</h4>
           <small>A partir de mañana</small>
@@ -147,4 +182,61 @@
     </div>
   </div>
 </div>
+
+<script>
+  function imprimirTurnosHoy() {
+    // Guardar el contenido actual
+    const contenidoOriginal = document.body.innerHTML;
+    
+    // Obtener solo los elementos que queremos imprimir
+    const header = document.getElementById('print-header').outerHTML;
+    const turnosHoy = document.getElementById('turnos-hoy').outerHTML;
+    
+    // Reemplazar con solo el contenido para imprimir
+    document.body.innerHTML = header + turnosHoy;
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar el contenido original
+    document.body.innerHTML = contenidoOriginal;
+  }
+  
+  function imprimirTurnosProximos() {
+    // Guardar el contenido actual
+    const contenidoOriginal = document.body.innerHTML;
+    
+    // Obtener solo los elementos que queremos imprimir
+    const header = document.getElementById('print-header').outerHTML;
+    const turnosProximos = document.getElementById('turnos-proximos').outerHTML;
+    
+    // Reemplazar con solo el contenido para imprimir
+    document.body.innerHTML = header + turnosProximos;
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar el contenido original
+    document.body.innerHTML = contenidoOriginal;
+  }
+  
+  function imprimirTodosTurnos() {
+    // Guardar el contenido actual
+    const contenidoOriginal = document.body.innerHTML;
+    
+    // Obtener solo los elementos que queremos imprimir
+    const header = document.getElementById('print-header').outerHTML;
+    const turnosHoy = document.getElementById('turnos-hoy').outerHTML;
+    const turnosProximos = document.getElementById('turnos-proximos').outerHTML;
+    
+    // Reemplazar con solo el contenido para imprimir
+    document.body.innerHTML = header + turnosHoy + '<div class="print-break-after"></div>' + turnosProximos;
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar el contenido original
+    document.body.innerHTML = contenidoOriginal;
+  }
+</script>
 {% endblock %}

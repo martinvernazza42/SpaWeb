@@ -24,11 +24,33 @@
     <title>Spa Bienestar</title>
 
     <style>
+      /* Paleta de colores */
+      :root {
+        --primary-color: #ff66b2;      /* Rosa original */
+        --secondary-color: #e8c2ca;    /* Rosa claro pastel */
+        --accent-color: #f5dce0;       /* Rosa muy claro pastel */
+        --dark-color: #333333;         /* Gris oscuro */
+        --light-color: #f8f8f8;        /* Gris muy claro */
+        --text-color: #333333;         /* Color de texto principal */
+        --text-light: #666666;         /* Color de texto secundario */
+        --white: #ffffff;              /* Blanco */
+        --success: #a8d8c0;            /* Verde pastel */
+        --warning: #f9e2ae;            /* Amarillo pastel */
+        --danger: #f5c4c4;             /* Rojo pastel */
+        
+        /* Colores para botones de acción */
+        --edit-color: #b5d8eb;         /* Azul pastel para editar */
+        --new-color: #c7e8ca;          /* Verde pastel para nuevo */
+        --delete-color: #f5c4c4;       /* Rojo pastel para borrar */
+        --view-color: #e8dfc2;         /* Amarillo pastel para ver */
+      }
+
       body {
-        font-family: Arial, sans-serif;
+        font-family: 'Montserrat', Arial, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #ffffff;
+        color: var(--text-color);
       }
 
       #background-container {
@@ -103,7 +125,7 @@
         height: 2px;
         bottom: -5px;
         left: 0;
-        background-color: #ff66b2;
+        background-color: var(--primary-color);
         transform-origin: bottom right;
         transition: transform 0.25s ease-out;
       }
@@ -115,7 +137,7 @@
 
       .navbar-nav .nav-link:hover {
         transform: translateY(-3px);
-        color: #ff66b2 !important;
+        color: var(--primary-color) !important;
       }
 
       .table tbody td {
@@ -155,6 +177,8 @@
       .dynamic-phrase.show {
         opacity: 1;
       }
+
+      /* Botones */
       .btn-pink {
         background-color: #ff66b2;
         color: white;
@@ -168,11 +192,145 @@
         display: inline-block;
         margin-top: 30px;
       }
+
       .btn-pink:hover {
         background-color: #e65c9d;
         transform: scale(1.05);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+        color: white;
       }
+      
+      /* Botones de acción con colores pastel */
+      .btn-edit {
+        background-color: var(--edit-color);
+        border-color: var(--edit-color);
+        color: var(--dark-color);
+      }
+      
+      .btn-edit:hover {
+        background-color: #9bc5db;
+        border-color: #9bc5db;
+      }
+      
+      .btn-new {
+        background-color: var(--new-color);
+        border-color: var(--new-color);
+        color: var(--dark-color);
+      }
+      
+      .btn-new:hover {
+        background-color: #aed5b2;
+        border-color: #aed5b2;
+      }
+      
+      .btn-delete {
+        background-color: var(--delete-color);
+        border-color: var(--delete-color);
+        color: var(--dark-color);
+      }
+      
+      .btn-delete:hover {
+        background-color: #e8b0b0;
+        border-color: #e8b0b0;
+      }
+      
+      .btn-view {
+        background-color: var(--view-color);
+        border-color: var(--view-color);
+        color: var(--dark-color);
+      }
+      
+      .btn-view:hover {
+        background-color: #d5cba7;
+        border-color: #d5cba7;
+      }
+
+      .btn-outline-pink {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+        background-color: transparent;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+        padding: 0.5rem 1.5rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .btn-outline-pink:hover {
+        background-color: var(--primary-color);
+        color: var(--white);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Tarjetas */
+      .card {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+      }
+
+      .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-header {
+        background-color: var(--light-color);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1rem 1.5rem;
+      }
+
+      .bg-pink {
+        background-color: var(--accent-color) !important;
+        color: var(--dark-color) !important;
+      }
+
+      /* Formularios */
+      .form-control {
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+      }
+
+      .form-control:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.2rem rgba(209, 165, 177, 0.25);
+      }
+
+      /* Tablas */
+      .table {
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+
+      .table thead th {
+        background-color: var(--light-color);
+        border-bottom: 2px solid var(--secondary-color);
+        color: var(--text-color);
+        font-weight: 600;
+      }
+
+      .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(232, 194, 202, 0.1);
+      }
+
+      /* Evitar que la página se desplace al hacer clic */
+      a, button, input[type="submit"] {
+        scroll-behavior: auto;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      a[href="#"], button[type="submit"] {
+        scroll-margin-top: 60px;
+      }
+
       .dropdown:hover .dropdown-menu {
         display: block;
         margin-top: 0;
@@ -185,8 +343,8 @@
         position: absolute;
       }
       .dropdown-item:hover {
-        background-color: #ffe6f0;
-        color: #ff66b2;
+        background-color: var(--accent-color);
+        color: var(--primary-color);
       }
       nav a.dropdown-toggle::after {
         display: inline-block;
@@ -210,7 +368,7 @@
         color: black;
       }
       .cart-icon:hover {
-        color: #ff66b2;
+        color: var(--primary-color);
       }
     </style>
   </head>
@@ -246,14 +404,20 @@
                     <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
+                    <a class="nav-link" href="{% url 'admin_dashboard' %}">Panel Administrador</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admin_dashboard' %}">Panel Admin</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                   </li>
                 {% elif user|has_attr:"profesional" %}
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'mis_turnos' %}">Mis Turnos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'consultas_profesional' %}">Consultas</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'historial_clientes' %}">Historial</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
@@ -271,9 +435,11 @@
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'quienes_somos' %}">Quiénes somos</a>
                   </li>
+                  <!-- Mis Turnos oculto temporalmente 
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'mis_turnos' %}">Mis Turnos</a>
                   </li>
+                  -->
                   <li class="nav-item">
                     <a class="nav-link" href="{% url 'perfil' %}">Perfil</a>
                   </li>

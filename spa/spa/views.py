@@ -56,14 +56,39 @@ def quienes_somos(request):
 
 
 def consulta_view(request):
+    # Obtener todos los servicios para el selector
+    servicios = Servicio.objects.all().order_by('nombre')
+    
     if request.method == "POST":
         nombre = request.POST.get('nombre')
         email = request.POST.get('email')
         mensaje = request.POST.get('mensaje')
-        Consulta(nombre=nombre, email=email, mensaje=mensaje).save()
+        servicio_id = request.POST.get('servicio_id')
+        
+        # Crear la consulta
+        consulta = Consulta(nombre=nombre, email=email, mensaje=mensaje)
+        
+        # Asignar servicio si se seleccionó uno
+        if servicio_id:
+            try:
+                servicio = Servicio.objects.get(pk=servicio_id)
+                consulta.servicio = servicio
+            except Servicio.DoesNotExist:
+                pass
+                
+        consulta.save()
         messages.success(request, 'Tu consulta ha sido enviada correctamente. ¡Gracias!')
         return redirect('consultas')
-    return render(request, 'consultas.html')
+    
+    # Filtrar mensajes para mostrar solo los relacionados con consultas
+    storage = messages.get_messages(request)
+    for message in storage:
+        if 'consulta' not in message.message.lower() and 'gracias' not in message.message.lower():
+            storage.used = False
+    
+    return render(request, 'consultas.html', {
+        'servicios': servicios
+    })
 
 
 def turnos(request):
@@ -139,12 +164,27 @@ def reservar_por_fecha(request, servicio_id, year, month, day):
     servicio = get_object_or_404(Servicio, pk=servicio_id)
     fecha_obj = _date(year, month, day)
 
-    todos_los_slots = Disponibilidad.objects.filter(servicio=servicio, fecha=fecha_obj)
-    slots = [slot for slot in todos_los_slots if not Turno.objects.filter(
+    # Obtener el carrito del usuario
+    cart = _get_cart(request)
+    
+    # Obtener los horarios ya agregados al carrito para este servicio y fecha
+    horarios_en_carrito = CartItem.objects.filter(
+        cart=cart,
         servicio=servicio,
-        fecha=fecha_obj,
-        hora=slot.hora_inicio
-    ).exists()]
+        fecha=fecha_obj
+    ).values_list('hora', flat=True)
+
+    todos_los_slots = Disponibilidad.objects.filter(servicio=servicio, fecha=fecha_obj)
+    
+    # Filtrar slots que no están en turnos ni en el carrito
+    slots = [slot for slot in todos_los_slots if not (
+        Turno.objects.filter(
+            servicio=servicio,
+            fecha=fecha_obj,
+            hora=slot.hora_inicio
+        ).exists() or 
+        slot.hora_inicio in horarios_en_carrito
+    )]
 
     ahora = timezone.now()
     cutoff = ahora + timedelta(hours=48)
@@ -213,15 +253,30 @@ login_view = auth_views.LoginView.as_view(
 
 @login_required
 def perfil(request):
-    # Verificar si el usuario tiene un cliente asociado
-    turnos = []
-    if hasattr(request.user, 'cliente'):
-        turnos = Turno.objects.filter(cliente=request.user.cliente)
+    user = request.user
+    is_profesional = hasattr(user, 'profesional')
     
-    consultas = Consulta.objects.filter(email=request.user.email)
+    # Variables por defecto
+    turnos = []
+    consultas = []
+    consultas_servicio = []
+    servicio_profesional = None
+    
+    if is_profesional:
+        # Si es profesional, obtener su servicio y consultas relacionadas
+        servicio_profesional = user.profesional.servicio
+        consultas_servicio = Consulta.objects.filter(mensaje__icontains=servicio_profesional.nombre)
+    elif hasattr(user, 'cliente'):
+        # Si es cliente, obtener sus turnos y consultas
+        turnos = Turno.objects.filter(cliente=user.cliente)
+        consultas = Consulta.objects.filter(email=user.email)
+    
     return render(request, 'perfil.html', {
         'turnos': turnos,
-        'consultas': consultas
+        'consultas': consultas,
+        'is_profesional': is_profesional,
+        'servicio_profesional': servicio_profesional,
+        'consultas_servicio': consultas_servicio
     })
 
 @login_required
@@ -265,22 +320,42 @@ def historial_clientes(request):
     """Vista para ver el historial de clientes para profesionales"""
     user = request.user
     
-    # Solo accesible para profesionales
-    if not hasattr(user, 'profesional'):
+    # Solo accesible para profesionales y administradores
+    is_admin = user.is_staff
+    if not hasattr(user, 'profesional') and not is_admin:
         messages.error(request, "No tienes permiso para acceder a esta sección")
         return redirect('index')
     
-    prof = user.profesional
     hoy = date.today()
     
-    # DEMO: Obtener todos los clientes que tienen turnos (no solo con este profesional)
-    clientes = Cliente.objects.filter(
-        turno__isnull=False
-    ).distinct().order_by('user__last_name', 'user__first_name')
+    # Obtener el servicio seleccionado o el servicio del profesional
+    servicio_id = request.GET.get('servicio_id')
+    servicio = None
     
-    # Si no hay clientes, mostrar todos los clientes
-    if not clientes.exists():
-        clientes = Cliente.objects.all().order_by('user__last_name', 'user__first_name')
+    if is_admin:
+        # Para administradores, permitir filtrar por servicio
+        if servicio_id:
+            servicio = get_object_or_404(Servicio, pk=servicio_id)
+        servicios = Servicio.objects.all().order_by('nombre')
+    else:
+        # Para profesionales, usar su servicio asignado
+        prof = user.profesional
+        servicio = prof.servicio
+        servicios = [servicio]  # Lista con un solo elemento para la plantilla
+    
+    # Filtrar clientes según el servicio
+    if servicio:
+        clientes = Cliente.objects.filter(
+            turno__servicio=servicio
+        ).distinct().order_by('user__last_name', 'user__first_name')
+    elif is_admin:
+        # Admin sin filtro muestra todos los clientes con turnos
+        clientes = Cliente.objects.filter(
+            turno__isnull=False
+        ).distinct().order_by('user__last_name', 'user__first_name')
+    else:
+        # No debería llegar aquí, pero por si acaso
+        clientes = Cliente.objects.none()
     
     # Si se seleccionó un cliente específico
     cliente_id = request.GET.get('cliente_id')
@@ -290,18 +365,33 @@ def historial_clientes(request):
     if cliente_id:
         try:
             cliente_seleccionado = Cliente.objects.get(pk=cliente_id)
-            # DEMO: Obtener todos los turnos de este cliente (no solo con este profesional)
-            turnos_cliente = Turno.objects.filter(
-                cliente=cliente_seleccionado
-            ).order_by('-fecha', '-hora')
             
-            # Si no hay turnos, crear uno de ejemplo para demostración
-            if not turnos_cliente.exists():
+            # Filtrar turnos según el servicio y/o profesional
+            if servicio and not is_admin:
+                # Para profesionales: solo turnos de su servicio
+                turnos_cliente = Turno.objects.filter(
+                    cliente=cliente_seleccionado,
+                    servicio=servicio
+                ).order_by('-fecha', '-hora')
+            elif servicio and is_admin:
+                # Para admin con filtro: turnos del servicio seleccionado
+                turnos_cliente = Turno.objects.filter(
+                    cliente=cliente_seleccionado,
+                    servicio=servicio
+                ).order_by('-fecha', '-hora')
+            elif is_admin:
+                # Para admin sin filtro: todos los turnos del cliente
+                turnos_cliente = Turno.objects.filter(
+                    cliente=cliente_seleccionado
+                ).order_by('-fecha', '-hora')
+            
+            # Si no hay turnos y es un profesional, crear uno de ejemplo
+            if not turnos_cliente.exists() and not is_admin and servicio:
                 # Verificar si ya existe un turno de ejemplo
                 turno_ejemplo = Turno.objects.filter(
                     cliente=cliente_seleccionado,
-                    servicio=prof.servicio,
-                    profesional=prof,
+                    servicio=servicio,
+                    profesional=user.profesional,
                     fecha=hoy
                 ).first()
                 
@@ -310,14 +400,17 @@ def historial_clientes(request):
                     from datetime import time
                     turno_ejemplo = Turno.objects.create(
                         cliente=cliente_seleccionado,
-                        servicio=prof.servicio,
-                        profesional=prof,
+                        servicio=servicio,
+                        profesional=user.profesional,
                         fecha=hoy,
                         hora=time(10, 0),  # 10:00 AM
                         comentario="Turno de ejemplo para demostración"
                     )
                     
-                turnos_cliente = Turno.objects.filter(cliente=cliente_seleccionado).order_by('-fecha', '-hora')
+                turnos_cliente = Turno.objects.filter(
+                    cliente=cliente_seleccionado,
+                    servicio=servicio
+                ).order_by('-fecha', '-hora')
                 
         except Cliente.DoesNotExist:
             messages.error(request, "Cliente no encontrado")
@@ -326,7 +419,9 @@ def historial_clientes(request):
         'clientes': clientes,
         'cliente_seleccionado': cliente_seleccionado,
         'turnos_cliente': turnos_cliente,
-        'servicio': prof.servicio,
+        'servicio': servicio,
+        'servicios': servicios,
+        'is_admin': is_admin,
     })
 
 @staff_member_required
@@ -845,6 +940,15 @@ def add_to_cart(request, servicio_id, fecha, hora):
     fecha_dt = timezone.datetime.strptime(fecha, '%Y-%m-%d').date()
     hora_dt  = timezone.datetime.strptime(hora,   '%H:%M').time()
 
+    # Obtener el profesional seleccionado (si existe)
+    profesional_id = request.GET.get('profesional_id')
+    profesional = None
+    if profesional_id:
+        try:
+            profesional = Profesional.objects.get(pk=profesional_id)
+        except Profesional.DoesNotExist:
+            pass
+
     disp = servicio.disponibilidades.filter(
         fecha=fecha_dt, hora_inicio=hora_dt
     ).first()
@@ -853,26 +957,44 @@ def add_to_cart(request, servicio_id, fecha, hora):
         return redirect('servicios')
 
     cart = _get_cart(request)
-    CartItem.objects.get_or_create(
+    
+    # Crear o actualizar el item del carrito
+    cart_item, created = CartItem.objects.get_or_create(
         cart     = cart,
         servicio = servicio,
         fecha    = fecha_dt,
         hora     = hora_dt,
-        hora_fin = disp.hora_fin
+        defaults={
+            'hora_fin': disp.hora_fin,
+            'profesional': profesional
+        }
     )
+    
+    # Si el item ya existía, actualizar el profesional si se seleccionó uno
+    if not created and profesional:
+        cart_item.profesional = profesional
+        cart_item.save()
+    
+    if created:
+        messages.success(request, f"Se agregó {servicio.nombre} a tu carrito.")
+    else:
+        messages.info(request, f"Se actualizó el servicio en tu carrito.")
+    
+    # Actualizar contador del carrito en la sesión
+    request.session['cart_count'] = CartItem.objects.filter(cart=cart).count()
 
-    return redirect(
-        reverse(
-            'reservar_por_fecha',
-            args=[servicio_id, fecha_dt.year, fecha_dt.month, fecha_dt.day]
-        )
-    )
+    # Redirigir al carrito en lugar de volver a la página de reserva
+    return redirect('view_cart')
 
 
 def view_cart(request):
     cart = _get_cart(request)
-    items = cart.items.select_related('servicio').all()
+    items = cart.items.select_related('servicio', 'profesional').all()
     total = sum(item.servicio.precio for item in items)
+    
+    # Actualizar contador del carrito en la sesión
+    request.session['cart_count'] = items.count()
+    
     return render(request, 'cart.html', {
         'items': items,
         'total': total,
@@ -881,7 +1003,7 @@ def view_cart(request):
 @require_http_methods(["GET", "POST"])
 def checkout(request):
     cart  = _get_cart(request)
-    items = list(cart.items.select_related('servicio'))
+    items = list(cart.items.select_related('servicio', 'profesional'))
     total = sum(item.servicio.precio for item in items)
 
     if request.method == 'POST':
@@ -895,17 +1017,61 @@ def checkout(request):
             messages.error(request, "No pudimos encontrar tu perfil de Cliente.")
             return redirect('perfil')
 
+        # Verificar si hay items en el carrito
+        if not items:
+            messages.error(request, "Tu carrito está vacío. No se puede procesar el pago.")
+            return redirect('view_cart')
+
+        # Verificar si aplica descuento (tarjeta de débito y reserva anticipada)
+        hoy = timezone.now().date()
+        primer_dia = min(item.fecha for item in items)
+        anticipado = (primer_dia - hoy) >= timedelta(days=2)
+            
+        metodo_pago = request.POST.get('metodo_pago')
+        aplicar_descuento = metodo_pago == 'debito' and anticipado
+        
+        # Calcular precio final
+        precio_base = total
+        precio_final = round(total * 0.85) if aplicar_descuento else total
+
         turnos_reservados = []
         for item in items:
             turno = Turno.objects.create(
-                cliente  = cliente_obj,
-                servicio = item.servicio,
-                fecha    = item.fecha,
-                hora     = item.hora
+                cliente     = cliente_obj,
+                servicio    = item.servicio,
+                profesional = item.profesional,
+                fecha       = item.fecha,
+                hora        = item.hora
             )
             turnos_reservados.append(turno)
 
+        # Limpiar el carrito y el contador
         cart.items.all().delete()
+        if 'cart_count' in request.session:
+            request.session['cart_count'] = 0
+            
+        # Enviar correo con confirmación
+        if turnos_reservados:
+            detalles_turnos = ""
+            for turno in turnos_reservados:
+                detalles_turnos += f"- {turno.servicio.nombre}: {turno.fecha.strftime('%d/%m/%Y')} a las {turno.hora.strftime('%H:%M')}\n"
+                
+            send_mail(
+                subject="Comprobante de pago - Spa Bienestar",
+                message=(
+                    f"¡Hola {request.user.get_full_name() or request.user.username}!\n\n"
+                    f"Gracias por tu pago.\n\n"
+                    f"Has reservado los siguientes servicios:\n{detalles_turnos}\n"
+                    f"Monto pagado: ${precio_final}\n\n"
+                    f"Te esperamos con gusto.\n"
+                ),
+                from_email=None,
+                recipient_list=[request.user.email],
+                fail_silently=False,
+            )
+            
+            messages.success(request, f"¡Tu reserva ha sido confirmada! Se ha enviado un correo con los detalles.")
+            
         return render(request, 'reserva_exitosa.html', {
             'turnos': turnos_reservados
         })
@@ -917,15 +1083,16 @@ def checkout(request):
     else:
         anticipado = False
 
-    precio_base      = total
-    precio_descuento = round(total * 0.85, 2) if anticipado else total
+    precio_base = total
+    precio_descuento = round(total * 0.85) if anticipado else total
 
-    return render(request, 'pago.html', {
-        'items':             items,
-        'total':             total,
-        'anticipado':        anticipado,
-        'precio_base':       precio_base,
-        'precio_descuento':  precio_descuento,
+    # Usar la plantilla de pago directamente sin redirigir a elegir_pago
+    return render(request, 'pago_carrito.html', {
+        'items': items,
+        'total': total,
+        'anticipado': anticipado,
+        'precio_base': precio_base,
+        'precio_descuento': precio_descuento,
     })
 
 

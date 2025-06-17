@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container my-5"> {# Agrego un contenedor para centrar y dar espacio #}
-  <h2 class="mb-4 text-center">🛒 Tu Carrito de Compras</h2> {# Título más atractivo #}
+<div class="container my-5">
+  <h2 class="mb-4 text-center">🛒 Tu Carrito de Compras</h2>
 
   {% if items %}
-    <div class="table-responsive"> {# Para que la tabla se vea bien en móviles #}
-      <table class="table table-hover table-striped"> {# Estilos de tabla de Bootstrap #}
+    <div class="table-responsive">
+      <table class="table table-hover table-striped">
         <thead>
           <tr>
             <th>Servicio</th>
             <th>Fecha</th>
             <th>Hora</th>
-            <th class="text-end">Precio</th> {# Alineo a la derecha el precio #}
-            <th></th> {# Columna para el botón de eliminar #}
+            <th>Profesional</th>
+            <th class="text-end">Precio</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -22,21 +23,28 @@
               <td>{{ item.servicio.nombre }}</td>
               <td>{{ item.fecha|date:"d/m/Y" }}</td>
               <td>{{ item.hora|time:"H:i" }}–{{ item.hora_fin|time:"H:i" }}</td>
+              <td>
+                {% if item.profesional %}
+                  {{ item.profesional }}
+                {% else %}
+                  <span class="text-muted">Sin preferencia</span>
+                {% endif %}
+              </td>
               <td class="text-end">${{ item.servicio.precio }}</td>
               <td>
                 <form method="post" action="{% url 'cart_remove' item.id %}">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
-                    <i class="fa-solid fa-trash"></i> {# Ícono de basura de Font Awesome #}
+                    <i class="fa-solid fa-trash"></i>
                   </button>
                 </form>
               </td>
             </tr>
           {% endfor %}
         </tbody>
-        <tfoot> {# Agrego un footer para el total #}
+        <tfoot>
           <tr>
-            <th colspan="3" class="text-end">Total:</th>
+            <th colspan="4" class="text-end">Total:</th>
             <th class="text-end">${{ total }}</th>
             <th></th>
           </tr>
@@ -44,7 +52,7 @@
       </table>
     </div>
 
-    <div class="d-flex justify-content-between align-items-center mt-4"> {# Contenedor para los botones #}
+    <div class="d-flex justify-content-between align-items-center mt-4">
       <a href="{% url 'servicios' %}" class="btn btn-outline-secondary">
         <i class="fa-solid fa-arrow-left"></i> Seguir Comprando
       </a>

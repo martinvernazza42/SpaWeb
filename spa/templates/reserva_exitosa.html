@@ -9,31 +9,72 @@
             <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
           </div>
           <h2 class="mb-3">¡Reserva confirmada!</h2>
-          <p class="lead mb-4">Tu turno ha sido reservado exitosamente.</p>
+          
+          {% if turnos|length > 1 %}
+            <p class="lead mb-4">Tus {{ turnos|length }} turnos han sido reservados exitosamente.</p>
+          {% else %}
+            <p class="lead mb-4">Tu turno ha sido reservado exitosamente.</p>
+          {% endif %}
           
           <div class="card mb-4">
             <div class="card-body">
               <h5 class="card-title">Detalles de tu reserva:</h5>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>Servicio:</span>
-                  <span class="fw-bold">{{ turno.servicio.nombre }}</span>
-                </li>
-                {% if turno.profesional %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>Profesional:</span>
-                  <span class="fw-bold">{{ turno.profesional }}</span>
-                </li>
-                {% endif %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>Fecha:</span>
-                  <span class="fw-bold">{{ turno.fecha|date:"d/m/Y" }}</span>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                  <span>Hora:</span>
-                  <span class="fw-bold">{{ turno.hora|time:"H:i" }}</span>
-                </li>
-              </ul>
+              
+              {% if turnos|length > 1 %}
+                <!-- Múltiples turnos -->
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Servicio</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Profesional</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for turno in turnos %}
+                        <tr>
+                          <td>{{ turno.servicio.nombre }}</td>
+                          <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+                          <td>{{ turno.hora|time:"H:i" }}</td>
+                          <td>
+                            {% if turno.profesional %}
+                              {{ turno.profesional }}
+                            {% else %}
+                              <span class="text-muted">Sin preferencia</span>
+                            {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              {% else %}
+                <!-- Un solo turno - Usar el primer turno de la lista -->
+                {% with turno=turnos.0 %}
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Servicio:</span>
+                    <span class="fw-bold">{{ turno.servicio.nombre }}</span>
+                  </li>
+                  {% if turno.profesional %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Profesional:</span>
+                    <span class="fw-bold">{{ turno.profesional }}</span>
+                  </li>
+                  {% endif %}
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Fecha:</span>
+                    <span class="fw-bold">{{ turno.fecha|date:"d/m/Y" }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>Hora:</span>
+                    <span class="fw-bold">{{ turno.hora|time:"H:i" }}</span>
+                  </li>
+                </ul>
+                {% endwith %}
+              {% endif %}
             </div>
           </div>
           

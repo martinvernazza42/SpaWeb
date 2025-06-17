@@ -33,6 +33,9 @@
     .print-only {
       display: block !important;
     }
+    .print-break-after {
+      page-break-after: always;
+    }
   }
   .print-only {
     display: none;
@@ -58,23 +61,56 @@
     </li>
   </ul>
 
+  {% if is_admin %}
+  <!-- Filtro de servicios para administradores -->
+  <div class="card mb-4 no-print">
+    <div class="card-body">
+      <form method="get" class="row g-3 align-items-center">
+        <div class="col-md-6">
+          <label for="servicio_id" class="form-label">Filtrar por servicio:</label>
+          <select name="servicio_id" id="servicio_id" class="form-select">
+            <option value="">Todos los servicios</option>
+            {% for srv in servicios %}
+            <option value="{{ srv.id }}" {% if servicio.id == srv.id %}selected{% endif %}>{{ srv.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary">Filtrar</button>
+          {% if servicio %}
+          <a href="{% url 'historial_clientes' %}" class="btn btn-outline-secondary ms-2">Limpiar filtro</a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+
   <div class="row">
     <!-- Columna de clientes -->
     <div class="col-md-3 no-print">
       <div class="card">
         <div class="card-header bg-primary text-white">
-          <h5 class="mb-0">Clientes</h5>
+          <h5 class="mb-0">
+            Clientes 
+            {% if servicio %}
+            de {{ servicio.nombre }}
+            {% endif %}
+          </h5>
         </div>
         <div class="card-body p-0 cliente-list">
           {% for cliente in clientes %}
             <div class="cliente-item {% if cliente_seleccionado.id == cliente.id %}active{% endif %}" 
-                 onclick="window.location.href='{% url 'historial_clientes' %}?cliente_id={{ cliente.id }}'">
+                 onclick="window.location.href='{% url 'historial_clientes' %}?cliente_id={{ cliente.id }}{% if servicio %}&servicio_id={{ servicio.id }}{% endif %}'">
               <strong>{{ cliente.user.last_name }}, {{ cliente.user.first_name }}</strong>
               <div class="small text-muted">{{ cliente.user.email }}</div>
             </div>
           {% empty %}
             <div class="p-3 text-center text-muted">
               No hay clientes con turnos registrados
+              {% if servicio %}
+              para {{ servicio.nombre }}
+              {% endif %}
             </div>
           {% endfor %}
         </div>
@@ -86,12 +122,20 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           {% if cliente_seleccionado %}
-            <h5 class="mb-0">Historial de {{ cliente_seleccionado.user.get_full_name }}</h5>
+            <h5 class="mb-0">
+              Historial de {{ cliente_seleccionado.user.get_full_name }}
+              {% if servicio %}
+              para {{ servicio.nombre }}
+              {% endif %}
+            </h5>
             <div>
+              <button onclick="imprimirTodosClientes()" class="btn btn-info no-print me-2">
+                <i class="fas fa-print"></i> Imprimir todos
+              </button>
               <a href="{% url 'historial_cliente_pdf' cliente_seleccionado.id %}" class="btn btn-danger no-print" target="_blank">
-                <i class="fas fa-file-pdf"></i> Imprimir Historial
+                <i class="fas fa-file-pdf"></i> Imprimir PDF
               </a>
-              <button onclick="window.print()" class="btn btn-secondary no-print">
+              <button onclick="window.print()" class="btn btn-secondary no-print ms-2">
                 <i class="fas fa-print"></i> Imprimir esta página
               </button>
             </div>
@@ -119,6 +163,9 @@
                       <th>Fecha</th>
                       <th>Hora</th>
                       <th>Servicio</th>
+                      {% if is_admin %}
+                      <th>Profesional</th>
+                      {% endif %}
                       <th class="no-print">Acciones</th>
                     </tr>
                   </thead>
@@ -128,6 +175,9 @@
                         <td>{{ turno.fecha|date:"d/m/Y" }}</td>
                         <td>{{ turno.hora|time:"H:i" }}</td>
                         <td>{{ turno.servicio.nombre }}</td>
+                        {% if is_admin %}
+                        <td>{{ turno.profesional|default:"No asignado" }}</td>
+                        {% endif %}
                         <td class="no-print">
                           <button class="btn btn-sm btn-outline-primary btn-comentario" 
                                   onclick="toggleComentario('comentario-{{ turno.id }}')">
@@ -154,7 +204,7 @@
                       </tr>
                       {% if turno.comentario %}
                         <tr>
-                          <td colspan="4" class="bg-light">
+                          <td colspan="{% if is_admin %}5{% else %}4{% endif %}" class="bg-light">
                             <strong>Comentario:</strong> {{ turno.comentario }}
                           </td>
                         </tr>
@@ -165,7 +215,11 @@
               </div>
             {% else %}
               <div class="alert alert-info">
-                No hay turnos registrados para este cliente.
+                No hay turnos registrados para este cliente
+                {% if servicio %}
+                en {{ servicio.nombre }}
+                {% endif %}
+                .
               </div>
             {% endif %}
           {% else %}
@@ -178,6 +232,48 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Contenido para impresión de todos los clientes -->
+<div class="print-only" id="todos-clientes-print">
+  <h2 class="text-center mb-4">Historial de Todos los Clientes</h2>
+  <p class="text-center mb-4">Fecha de impresión: {% now "d/m/Y H:i" %}</p>
+  
+  {% for cliente in clientes %}
+    <div class="mb-5 {% if not forloop.last %}print-break-after{% endif %}">
+      <h3>{{ cliente.user.get_full_name }}</h3>
+      <p>Email: {{ cliente.user.email }}</p>
+      <p>Teléfono: {{ cliente.telefono|default:"No registrado" }}</p>
+      <hr>
+      
+      {% with turnos=cliente.turno_set.all %}
+        {% if turnos %}
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Servicio</th>
+                <th>Comentario</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for turno in turnos %}
+                <tr>
+                  <td>{{ turno.fecha|date:"d/m/Y" }}</td>
+                  <td>{{ turno.hora|time:"H:i" }}</td>
+                  <td>{{ turno.servicio.nombre }}</td>
+                  <td>{{ turno.comentario|default:"Sin comentarios" }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="alert alert-info">No hay turnos registrados para este cliente.</p>
+        {% endif %}
+      {% endwith %}
+    </div>
+  {% endfor %}
 </div>
 
 <script>
@@ -193,6 +289,27 @@
       // Mostrar solo el seleccionado
       comentarioForm.style.display = 'block';
     }
+  }
+  
+  function imprimirTodosClientes() {
+    // Guardar el contenido actual
+    const contenidoOriginal = document.body.innerHTML;
+    
+    // Reemplazar con solo el contenido para imprimir
+    const contenidoImprimir = document.getElementById('todos-clientes-print').innerHTML;
+    document.body.innerHTML = contenidoImprimir;
+    
+    // Imprimir
+    window.print();
+    
+    // Restaurar el contenido original
+    document.body.innerHTML = contenidoOriginal;
+    
+    // Volver a agregar los event listeners
+    document.querySelectorAll('.btn-comentario').forEach(btn => {
+      const id = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+      btn.onclick = function() { toggleComentario(id); };
+    });
   }
 </script>
 {% endblock %}

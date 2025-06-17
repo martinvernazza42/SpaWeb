@@ -1,0 +1,167 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+  :root {
+    --primary: #ff66b2;
+    --secondary: #e8c2ca;
+    --accent: #f5dce0;
+    --primary-fg: #fff;
+    --body-bg: #f8f8f8;
+    --body-quiet-color: #666;
+    --body-loud-color: #333;
+    --header-color: #fff;
+    --header-branding-color: #fff;
+    --header-bg: #ff66b2;
+    --header-link-color: #fff;
+    --breadcrumbs-fg: #e8c2ca;
+    --breadcrumbs-link-fg: #ff66b2;
+    --breadcrumbs-bg: #f8f8f8;
+    --link-fg: #ff66b2;
+    --link-hover-color: #e65c9d;
+    --link-selected-fg: #e65c9d;
+    --button-bg: #ff66b2;
+    --button-fg: #fff;
+    --button-hover-bg: #e65c9d;
+    --default-button-bg: #f8f8f8;
+    --default-button-fg: #333;
+    --default-button-hover-bg: #e8e8e8;
+    --close-button-bg: #888;
+    --close-button-hover-bg: #747474;
+    --delete-button-bg: #f5c4c4;
+    --delete-button-hover-bg: #e8b0b0;
+    --object-tools-fg: #fff;
+    --object-tools-bg: #ff66b2;
+    --object-tools-hover-bg: #e65c9d;
+  }
+
+  /* Mejoras adicionales */
+  #header {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .button, input[type=submit], input[type=button], .submit-row input, a.button {
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  .module h2, .module caption, .inline-group h2 {
+    background: #ff66b2;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .dashboard .module table th {
+    background: #f5dce0;
+    color: #333;
+  }
+
+  div.breadcrumbs {
+    background: #f5dce0;
+    border-bottom: 1px solid #eee;
+    color: #333;
+  }
+
+  div.breadcrumbs a {
+    color: #ff66b2;
+  }
+
+  div.breadcrumbs a:hover {
+    color: #e65c9d;
+  }
+
+  /* Botones de acción con colores pastel */
+  .addlink {
+    background: url(../img/icon-addlink.svg) 0 0 no-repeat;
+    background-color: #c7e8ca !important;
+    color: #333 !important;
+    border-radius: 4px;
+    padding: 4px 12px 4px 25px !important;
+    border: 1px solid #aed5b2;
+  }
+  
+  .addlink:hover {
+    background-color: #aed5b2 !important;
+  }
+  
+  .changelink {
+    background: url(../img/icon-changelink.svg) 0 0 no-repeat;
+    background-color: #b5d8eb !important;
+    color: #333 !important;
+    border-radius: 4px;
+    padding: 4px 12px 4px 25px !important;
+    border: 1px solid #9bc5db;
+  }
+  
+  .changelink:hover {
+    background-color: #9bc5db !important;
+  }
+  
+  .deletelink {
+    background: url(../img/icon-deletelink.svg) 0 0 no-repeat;
+    background-color: #f5c4c4 !important;
+    color: #333 !important;
+    border-radius: 4px;
+    padding: 4px 12px 4px 25px !important;
+    border: 1px solid #e8b0b0;
+  }
+  
+  .deletelink:hover {
+    background-color: #e8b0b0 !important;
+  }
+  
+  .viewlink {
+    background: url(../img/icon-viewlink.svg) 0 0 no-repeat;
+    background-color: #e8dfc2 !important;
+    color: #333 !important;
+    border-radius: 4px;
+    padding: 4px 12px 4px 25px !important;
+    border: 1px solid #d5cba7;
+  }
+  
+  .viewlink:hover {
+    background-color: #d5cba7 !important;
+  }
+
+  /* Evitar que la página se desplace al hacer clic */
+  a, button, input[type="submit"] {
+    scroll-behavior: auto;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  a[href="#"], button[type="submit"] {
+    scroll-margin-top: 60px;
+  }
+  
+  /* Ocultar botón de crear usuario */
+  body.app-auth.model-user .addlink {
+    display: none !important;
+  }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+  <a href="{% url 'admin:index' %}">
+    <span style="font-weight: 300;">Spa</span> <strong>Bienestar</strong> <span style="font-size: 0.8em; opacity: 0.8;">Admin</span>
+  </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

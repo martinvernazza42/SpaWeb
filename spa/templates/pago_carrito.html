@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+          <h2 class="mb-4">Pago online</h2>
+          
+          <div class="mb-4">
+            <h5>Detalles de tu compra:</h5>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Servicio</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Profesional</th>
+                    <th class="text-end">Precio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in items %}
+                    <tr>
+                      <td>{{ item.servicio.nombre }}</td>
+                      <td>{{ item.fecha|date:"d/m/Y" }}</td>
+                      <td>{{ item.hora|time:"H:i" }}</td>
+                      <td>
+                        {% if item.profesional %}
+                          {{ item.profesional }}
+                        {% else %}
+                          <span class="text-muted">Sin preferencia</span>
+                        {% endif %}
+                      </td>
+                      <td class="text-end">${{ item.servicio.precio }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="text-end">Total:</td>
+                    <td class="text-end" id="precio-total">${{ precio_base }}</td>
+                  </tr>
+                  {% if anticipado %}
+                  <tr id="fila-descuento" style="display: none;">
+                    <td colspan="4" class="text-end text-success">Descuento (15%):</td>
+                    <td class="text-end text-success" id="precio-descuento">-${{ precio_base|floatformat:0|default:0|add:"-"|add:precio_descuento|floatformat:0|default:0 }}</td>
+                  </tr>
+                  <tr id="fila-total-final" style="display: none;">
+                    <td colspan="4" class="text-end fw-bold">Total final:</td>
+                    <td class="text-end fw-bold" id="precio-final">${{ precio_descuento }}</td>
+                  </tr>
+                  {% endif %}
+                </tfoot>
+              </table>
+            </div>
+          </div>
+          
+          <form method="post" id="payment-form">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <h5>Método de pago:</h5>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="metodo_pago" id="credito" value="credito" checked>
+                <label class="form-check-label" for="credito">
+                  <i class="fas fa-credit-card me-2"></i> Tarjeta de crédito
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="metodo_pago" id="debito" value="debito">
+                <label class="form-check-label" for="debito">
+                  <i class="fas fa-money-check me-2"></i> Tarjeta de débito
+                  {% if anticipado %}
+                  <span class="badge bg-success ms-2">15% OFF</span>
+                  {% endif %}
+                </label>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="numero_tarjeta" class="form-label">Número de tarjeta</label>
+              <input type="text" class="form-control" id="numero_tarjeta" name="numero_tarjeta" 
+                     placeholder="1234 5678 9012 3456" required
+                     pattern="[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}"
+                     maxlength="19">
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="fecha_vencimiento" class="form-label">Fecha de vencimiento</label>
+                <input type="text" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento" 
+                       placeholder="MM/AA" required
+                       pattern="(0[1-9]|1[0-2])\/[0-9]{2}"
+                       maxlength="5">
+              </div>
+              <div class="col-md-6">
+                <label for="codigo_seguridad" class="form-label">Código de seguridad</label>
+                <input type="text" class="form-control" id="codigo_seguridad" name="codigo_seguridad" 
+                       placeholder="123" required
+                       pattern="[0-9]{3,4}"
+                       maxlength="4">
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="nombre_titular" class="form-label">Nombre del titular</label>
+              <input type="text" class="form-control" id="nombre_titular" name="nombre_titular" 
+                     placeholder="Como aparece en la tarjeta" required>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary py-3">
+                <i class="fas fa-lock me-2"></i> Pagar ahora
+              </button>
+            </div>
+          </form>
+          
+          <div class="mt-3 text-center">
+            <a href="{% url 'view_cart' %}" class="text-secondary">
+              <i class="fas fa-arrow-left me-1"></i> Volver al carrito
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Formatear número de tarjeta
+    const numeroTarjeta = document.getElementById('numero_tarjeta');
+    numeroTarjeta.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 16) value = value.slice(0, 16);
+      
+      // Formatear con espacios cada 4 dígitos
+      let formattedValue = '';
+      for (let i = 0; i < value.length; i++) {
+        if (i > 0 && i % 4 === 0) formattedValue += ' ';
+        formattedValue += value[i];
+      }
+      
+      e.target.value = formattedValue;
+    });
+    
+    // Formatear fecha de vencimiento
+    const fechaVencimiento = document.getElementById('fecha_vencimiento');
+    fechaVencimiento.addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 4) value = value.slice(0, 4);
+      
+      // Formatear como MM/AA
+      if (value.length > 2) {
+        value = value.slice(0, 2) + '/' + value.slice(2);
+      }
+      
+      e.target.value = value;
+    });
+    
+    // Permitir solo números en código de seguridad
+    const codigoSeguridad = document.getElementById('codigo_seguridad');
+    codigoSeguridad.addEventListener('input', function(e) {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+    });
+    
+    // Validación del formulario
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(e) {
+      let isValid = true;
+      
+      // Validar número de tarjeta
+      const cardNumber = numeroTarjeta.value.replace(/\s/g, '');
+      if (cardNumber.length !== 16 || !/^\d+$/.test(cardNumber)) {
+        numeroTarjeta.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        numeroTarjeta.classList.remove('is-invalid');
+      }
+      
+      // Validar fecha de vencimiento
+      const expDate = fechaVencimiento.value;
+      if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expDate)) {
+        fechaVencimiento.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        fechaVencimiento.classList.remove('is-invalid');
+      }
+      
+      // Validar código de seguridad
+      const cvv = codigoSeguridad.value;
+      if (!/^\d{3,4}$/.test(cvv)) {
+        codigoSeguridad.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        codigoSeguridad.classList.remove('is-invalid');
+      }
+      
+      if (!isValid) {
+        e.preventDefault();
+      }
+    });
+    
+    // Manejar cambio de método de pago para mostrar/ocultar descuento
+    const creditoRadio = document.getElementById('credito');
+    const debitoRadio = document.getElementById('debito');
+    const filaDescuento = document.getElementById('fila-descuento');
+    const filaTotalFinal = document.getElementById('fila-total-final');
+    
+    function actualizarPrecio() {
+      if (debitoRadio && debitoRadio.checked && filaDescuento && filaTotalFinal) {
+        filaDescuento.style.display = 'table-row';
+        filaTotalFinal.style.display = 'table-row';
+      } else if (filaDescuento && filaTotalFinal) {
+        filaDescuento.style.display = 'none';
+        filaTotalFinal.style.display = 'none';
+      }
+    }
+    
+    if (creditoRadio) creditoRadio.addEventListener('change', actualizarPrecio);
+    if (debitoRadio) debitoRadio.addEventListener('change', actualizarPrecio);
+    
+    // Inicializar
+    actualizarPrecio();
+  });
+</script>
+{% endblock %}

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from . import views
+from . import views_consultas
 
 urlpatterns = [
     # Secciones generales
@@ -21,7 +22,9 @@ urlpatterns = [
     ),
     path('quienes-somos/', views.quienes_somos, name='quienes_somos'),
     path('turnos/', views.turnos, name='turnos'),
-    path('consultas/', views.consulta_view, name='consultas'),
+    path('consultas/', views_consultas.consulta_view, name='consultas'),
+    path('mis-consultas/', views_consultas.consultas_profesional, name='consultas_profesional'),
+    path('responder-consulta/<int:consulta_id>/', views_consultas.responder_consulta, name='responder_consulta'),
 
     # Reserva
     path(

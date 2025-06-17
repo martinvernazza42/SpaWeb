@@ -5,10 +5,17 @@
     <div class="col-md-8">
       <div class="card shadow-sm border-light mb-4">
         <div class="card-header text-center bg-pink text-white">
+          {% if is_profesional %}
+          <h3 class="text-black">Perfil del Profesional</h3>
+          <p class="text-black">
+            Consulta tu información profesional registrada en el sistema.
+          </p>
+          {% else %}
           <h3 class="text-black">Perfil del Usuario</h3>
           <p class="text-black">
             Consulta tu información personal registrada en el sistema.
           </p>
+          {% endif %}
         </div>
         <div class="card-body">
           <ul class="list-group list-group-flush">
@@ -29,6 +36,11 @@
               <strong>Teléfono:</strong> {{ user.cliente.telefono }}
             </li>
             {% endif %}
+            {% if is_profesional %}
+            <li class="list-group-item">
+              <strong>Servicio asignado:</strong> {{ servicio_profesional.nombre }}
+            </li>
+            {% endif %}
           </ul>
           <div class="d-grid gap-2 mt-4">
             <a href="{% url 'logout' %}" class="btn btn-secondary">Cerrar sesión</a>
@@ -36,7 +48,47 @@
         </div>
       </div>
 
-      <!-- Turnos reservados -->
+      {% if is_profesional %}
+      <!-- Accesos rápidos para profesionales -->
+      <div class="card shadow-sm border-light mb-4">
+        <div class="card-header bg-pink text-white">
+          <h5 class="text-black">Accesos rápidos</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="{% url 'mis_turnos' %}" class="btn btn-primary">
+              <i class="fas fa-calendar-alt me-2"></i> Ver mis turnos
+            </a>
+            <a href="{% url 'historial_clientes' %}" class="btn btn-info">
+              <i class="fas fa-users me-2"></i> Historial de clientes
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Consultas relacionadas con el servicio -->
+      <div class="card shadow-sm border-light">
+        <div class="card-header bg-pink text-white">
+          <h5 class="text-black">Consultas sobre {{ servicio_profesional.nombre }}</h5>
+        </div>
+        <div class="card-body">
+          {% if consultas_servicio %}
+          <ul class="list-group">
+            {% for consulta in consultas_servicio %}
+            <li class="list-group-item">
+              <strong>Nombre:</strong> {{ consulta.nombre }}<br />
+              <strong>Email:</strong> {{ consulta.email }}<br />
+              <strong>Mensaje:</strong> {{ consulta.mensaje }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted">No hay consultas sobre este servicio.</p>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <!-- Turnos reservados para clientes -->
       <div class="card shadow-sm border-light mb-4">
         <div class="card-header bg-pink text-white">
           <h5 class="text-black">Turnos reservados</h5>
@@ -47,8 +99,11 @@
             {% for turno in turnos %}
             <li class="list-group-item">
               <strong>Servicio:</strong> {{ turno.servicio.nombre }}<br />
-              <strong>Fecha:</strong> {{ turno.fecha }}<br />
-              <strong>Hora:</strong> {{ turno.hora }}
+              <strong>Fecha:</strong> {{ turno.fecha|date:"d/m/Y" }}<br />
+              <strong>Hora:</strong> {{ turno.hora|time:"H:i" }}
+              {% if turno.profesional %}
+              <br /><strong>Profesional:</strong> {{ turno.profesional }}
+              {% endif %}
             </li>
             {% endfor %}
           </ul>
@@ -58,7 +113,7 @@
         </div>
       </div>
 
-      <!-- Consultas enviadas -->
+      <!-- Consultas enviadas para clientes -->
       <div class="card shadow-sm border-light">
         <div class="card-header bg-pink text-white">
           <h5 class="text-black">Consultas enviadas</h5>
@@ -79,6 +134,7 @@
           {% endif %}
         </div>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>
