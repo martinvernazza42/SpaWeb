@@ -24,33 +24,11 @@
     <title>Spa Bienestar</title>
 
     <style>
-      /* Paleta de colores */
-      :root {
-        --primary-color: #ff66b2;      /* Rosa original */
-        --secondary-color: #e8c2ca;    /* Rosa claro pastel */
-        --accent-color: #f5dce0;       /* Rosa muy claro pastel */
-        --dark-color: #333333;         /* Gris oscuro */
-        --light-color: #f8f8f8;        /* Gris muy claro */
-        --text-color: #333333;         /* Color de texto principal */
-        --text-light: #666666;         /* Color de texto secundario */
-        --white: #ffffff;              /* Blanco */
-        --success: #a8d8c0;            /* Verde pastel */
-        --warning: #f9e2ae;            /* Amarillo pastel */
-        --danger: #f5c4c4;             /* Rojo pastel */
-        
-        /* Colores para botones de acción */
-        --edit-color: #b5d8eb;         /* Azul pastel para editar */
-        --new-color: #c7e8ca;          /* Verde pastel para nuevo */
-        --delete-color: #f5c4c4;       /* Rojo pastel para borrar */
-        --view-color: #e8dfc2;         /* Amarillo pastel para ver */
-      }
-
       body {
-        font-family: 'Montserrat', Arial, sans-serif;
+        font-family: Arial, sans-serif;
         margin: 0;
         padding: 0;
         background-color: #ffffff;
-        color: var(--text-color);
       }
 
       #background-container {
@@ -125,7 +103,7 @@
         height: 2px;
         bottom: -5px;
         left: 0;
-        background-color: var(--primary-color);
+        background-color: #ff66b2;
         transform-origin: bottom right;
         transition: transform 0.25s ease-out;
       }
@@ -137,7 +115,7 @@
 
       .navbar-nav .nav-link:hover {
         transform: translateY(-3px);
-        color: var(--primary-color) !important;
+        color: #ff66b2 !important;
       }
 
       .table tbody td {
@@ -177,8 +155,6 @@
       .dynamic-phrase.show {
         opacity: 1;
       }
-
-      /* Botones */
       .btn-pink {
         background-color: #ff66b2;
         color: white;
@@ -192,145 +168,11 @@
         display: inline-block;
         margin-top: 30px;
       }
-
       .btn-pink:hover {
         background-color: #e65c9d;
         transform: scale(1.05);
         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-        color: white;
       }
-      
-      /* Botones de acción con colores pastel */
-      .btn-edit {
-        background-color: var(--edit-color);
-        border-color: var(--edit-color);
-        color: var(--dark-color);
-      }
-      
-      .btn-edit:hover {
-        background-color: #9bc5db;
-        border-color: #9bc5db;
-      }
-      
-      .btn-new {
-        background-color: var(--new-color);
-        border-color: var(--new-color);
-        color: var(--dark-color);
-      }
-      
-      .btn-new:hover {
-        background-color: #aed5b2;
-        border-color: #aed5b2;
-      }
-      
-      .btn-delete {
-        background-color: var(--delete-color);
-        border-color: var(--delete-color);
-        color: var(--dark-color);
-      }
-      
-      .btn-delete:hover {
-        background-color: #e8b0b0;
-        border-color: #e8b0b0;
-      }
-      
-      .btn-view {
-        background-color: var(--view-color);
-        border-color: var(--view-color);
-        color: var(--dark-color);
-      }
-      
-      .btn-view:hover {
-        background-color: #d5cba7;
-        border-color: #d5cba7;
-      }
-
-      .btn-outline-pink {
-        color: var(--primary-color);
-        border-color: var(--primary-color);
-        background-color: transparent;
-        text-transform: uppercase;
-        font-size: 0.9rem;
-        letter-spacing: 0.5px;
-        font-weight: 500;
-        padding: 0.5rem 1.5rem;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-      }
-
-      .btn-outline-pink:hover {
-        background-color: var(--primary-color);
-        color: var(--white);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      }
-
-      /* Tarjetas */
-      .card {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-      }
-
-      .card:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      }
-
-      .card-header {
-        background-color: var(--light-color);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        padding: 1rem 1.5rem;
-      }
-
-      .bg-pink {
-        background-color: var(--accent-color) !important;
-        color: var(--dark-color) !important;
-      }
-
-      /* Formularios */
-      .form-control {
-        border-radius: 4px;
-        border: 1px solid #e0e0e0;
-        padding: 0.6rem 1rem;
-        transition: all 0.3s ease;
-      }
-
-      .form-control:focus {
-        border-color: var(--secondary-color);
-        box-shadow: 0 0 0 0.2rem rgba(209, 165, 177, 0.25);
-      }
-
-      /* Tablas */
-      .table {
-        border-collapse: separate;
-        border-spacing: 0;
-      }
-
-      .table thead th {
-        background-color: var(--light-color);
-        border-bottom: 2px solid var(--secondary-color);
-        color: var(--text-color);
-        font-weight: 600;
-      }
-
-      .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(232, 194, 202, 0.1);
-      }
-
-      /* Evitar que la página se desplace al hacer clic */
-      a, button, input[type="submit"] {
-        scroll-behavior: auto;
-      }
-
-      html {
-        scroll-behavior: smooth;
-      }
-
-      a[href="#"], button[type="submit"] {
-        scroll-margin-top: 60px;
-      }
-
       .dropdown:hover .dropdown-menu {
         display: block;
         margin-top: 0;
@@ -343,8 +185,8 @@
         position: absolute;
       }
       .dropdown-item:hover {
-        background-color: var(--accent-color);
-        color: var(--primary-color);
+        background-color: #ffe6f0;
+        color: #ff66b2;
       }
       nav a.dropdown-toggle::after {
         display: inline-block;
@@ -368,7 +210,124 @@
         color: black;
       }
       .cart-icon:hover {
-        color: var(--primary-color);
+        color: #ff66b2;
+      }
+      
+      /* Estilos del chatbot */
+      .chat-widget {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        height: 450px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1050;
+        display: none;
+        overflow: hidden;
+      }
+      
+      .chat-header {
+        background: #ff66b2;
+        color: white;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .chat-header h5 {
+        margin: 0;
+        font-size: 1rem;
+      }
+      
+      .chat-close {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2rem;
+      }
+      
+      .chat-body {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      #chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f9fa;
+      }
+      
+      .chat-footer {
+        padding: 10px;
+        border-top: 1px solid #eee;
+      }
+      
+      .suggestions-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      
+      .suggestion-btn {
+        background: #f0f0f0;
+        border: 1px solid #ddd;
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      
+      .suggestion-btn:hover {
+        background: #ff66b2;
+        color: white;
+      }
+      
+      /* Indicador de escritura */
+      .chat-typing {
+        display: none;
+        margin-bottom: 10px;
+        padding: 0 15px;
+      }
+      
+      .typing-indicator {
+        display: inline-flex;
+        align-items: center;
+        background: #e9ecef;
+        padding: 8px 15px;
+        border-radius: 15px;
+      }
+      
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background: #6c757d;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typing 1.4s infinite;
+      }
+      
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      
+      @keyframes typing {
+        0%, 100% { opacity: 0.3; transform: translateY(0); }
+        50% { opacity: 1; transform: translateY(-2px); }
       }
     </style>
   </head>
@@ -559,102 +518,137 @@
     <button
       id="chat-toggle"
       class="btn btn-pink position-fixed"
-      style="bottom:20px; right:20px; z-index:1040;"
+      style="bottom:20px; right:20px; z-index:1040; border-radius:50%; width:60px; height:60px; padding:0;"
     >
-      💬 Ayuda
+      <i class="fas fa-comments" style="font-size:1.5rem;"></i>
     </button>
 
-    <div
-      class="offcanvas offcanvas-end"
-      tabindex="-1"
-      id="chatCanvas"
-      aria-labelledby="chatCanvasLabel"
-    >
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="chatCanvasLabel">Chat de Ayuda</h5>
-        <button
-          type="button"
-          class="btn-close text-reset"
-          data-bs-dismiss="offcanvas"
-          aria-label="Cerrar"
-        ></button>
+    <div id="chat-widget" class="chat-widget">
+      <div class="chat-header">
+        <h5><i class="fas fa-robot me-2"></i> Asistente Virtual</h5>
+        <button id="chat-close" class="chat-close">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
-      <div class="offcanvas-body d-flex flex-column">
-        <div
-          id="chat-messages"
-          class="flex-grow-1 overflow-auto mb-2 p-2"
-          style="background: #f8f9fa; border-radius: .25rem;"
-        ></div>
+      <div class="chat-body">
+        <div id="chat-messages"></div>
+        
+        <div class="chat-typing">
+          <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-footer">
         <div class="input-group">
           <input
             type="text"
             id="chat-input"
             class="form-control"
-            placeholder="Escribe tu mensaje…"
+            placeholder="Escribe tu mensaje..."
           />
-          <button class="btn btn-pink" id="chat-send">Enviar</button>
+          <button class="btn btn-pink" id="chat-send">
+            <i class="fas fa-paper-plane"></i>
+          </button>
         </div>
       </div>
     </div>
 
     <script>
       const chatToggle = document.getElementById('chat-toggle');
-      const chatCanvas = new bootstrap.Offcanvas('#chatCanvas');
+      const chatWidget = document.getElementById('chat-widget');
+      const chatClose = document.getElementById('chat-close');
       const msgContainer = document.getElementById('chat-messages');
       const inputEl = document.getElementById('chat-input');
       const sendBtn = document.getElementById('chat-send');
+      const typingIndicator = document.querySelector('.chat-typing');
+      let greeted = false;
 
-      chatToggle.addEventListener('click', () => chatCanvas.show());
-
-      async function sendMessage(text) {
-        msgContainer.innerHTML += `
-          <div class="text-end">
-            <small class="text-muted">Tú</small>
-            <div class="bg-white d-inline-block p-2 rounded mb-2">${text}</div>
-          </div>`;
-        msgContainer.scrollTop = msgContainer.scrollHeight;
-
-        const res = await fetch('/api/chat/', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({message: text})
-        });
-        const data = await res.json();
-
-        msgContainer.innerHTML += `
-          <div class="text-start">
-            <small class="text-muted">Bot</small>
-            <div class="bg-light d-inline-block p-2 rounded mb-2">${data.reply}</div>
-          </div>`;
-        msgContainer.scrollTop = msgContainer.scrollHeight;
+      function showTyping() {
+        typingIndicator.style.display = 'block';
       }
 
+      function hideTyping() {
+        typingIndicator.style.display = 'none';
+      }
+      
+      function toggleChat() {
+        if (chatWidget.style.display === 'flex') {
+          chatWidget.style.display = 'none';
+        } else {
+          chatWidget.style.display = 'flex';
+          if (msgContainer.innerHTML === '') {
+            setTimeout(() => sendMessage('hola'), 500);
+          }
+          inputEl.focus();
+        }
+      }
+
+      async function sendMessage(text) {
+        // Mostrar mensaje del usuario
+        msgContainer.innerHTML += `
+          <div class="text-end mb-3">
+            <div class="bg-primary text-white d-inline-block p-2 rounded-3">${text}</div>
+          </div>`;
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+        
+        // Mostrar indicador de escritura
+        showTyping();
+
+        try {
+          // Enviar al servidor
+          const res = await fetch('/api/chat/', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({message: text})
+          });
+          
+          // Simular tiempo de respuesta natural
+          await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500));
+          
+          const data = await res.json();
+          
+          // Ocultar indicador de escritura
+          hideTyping();
+
+          // Mostrar respuesta del bot
+          msgContainer.innerHTML += `
+            <div class="text-start mb-3">
+              <div class="bg-light d-inline-block p-2 rounded-3">${data.reply}</div>
+            </div>`;
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+          
+          // Activar botones de sugerencia
+          document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+              sendMessage(btn.textContent);
+            });
+          });
+        } catch (error) {
+          hideTyping();
+          msgContainer.innerHTML += `
+            <div class="text-start mb-3">
+              <div class="bg-light d-inline-block p-2 rounded-3">Lo siento, ha ocurrido un error. Por favor, intenta de nuevo.</div>
+            </div>`;
+          msgContainer.scrollTop = msgContainer.scrollHeight;
+        }
+      }
+
+      // Event listeners
+      chatToggle.addEventListener('click', toggleChat);
+      chatClose.addEventListener('click', toggleChat);
+      
       sendBtn.addEventListener('click', () => {
         const text = inputEl.value.trim();
         if (!text) return;
         inputEl.value = '';
         sendMessage(text);
       });
+      
       inputEl.addEventListener('keypress', e => {
         if (e.key === 'Enter') sendBtn.click();
-      });
-
-      function appendBotMessage(text) {
-        msgContainer.innerHTML += `
-          <div class="text-start">
-            <small class="text-muted">Bot</small>
-            <div class="bg-light d-inline-block p-2 rounded mb-2">${text}</div>
-          </div>`;
-        msgContainer.scrollTop = msgContainer.scrollHeight;
-      }
-
-      let greeted = false;
-
-      chatToggle.addEventListener('click', () => {
-        if (!greeted) {
-          appendBotMessage('¡Hola! ¿En qué puedo ayudarte?');
-          greeted = true;
-        }
       });
     </script>
   </body>

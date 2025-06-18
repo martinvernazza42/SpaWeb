@@ -128,19 +128,30 @@
               para {{ servicio.nombre }}
               {% endif %}
             </h5>
-            <div>
-              <button onclick="imprimirTodosClientes()" class="btn btn-info no-print me-2">
-                <i class="fas fa-print"></i> Imprimir todos
+            <div class="dropdown no-print">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-print me-1"></i> Opciones de impresión
               </button>
-              <a href="{% url 'historial_cliente_pdf' cliente_seleccionado.id %}" class="btn btn-danger no-print" target="_blank">
-                <i class="fas fa-file-pdf"></i> Imprimir PDF
-              </a>
-              <button onclick="window.print()" class="btn btn-secondary no-print ms-2">
-                <i class="fas fa-print"></i> Imprimir esta página
-              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                <li><button class="dropdown-item" onclick="window.print()">
+                  <i class="fas fa-print me-2"></i> Imprimir historial de este cliente
+                </button></li>
+                <li><button class="dropdown-item" onclick="imprimirTodosClientes()">
+                  <i class="fas fa-users me-2"></i> Imprimir historial de todos los clientes
+                </button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'historial_cliente_pdf' cliente_seleccionado.id %}" target="_blank">
+                  <i class="fas fa-file-pdf me-2"></i> Descargar PDF de este cliente
+                </a></li>
+              </ul>
             </div>
           {% else %}
             <h5 class="mb-0">Historial de Clientes</h5>
+            <div class="no-print">
+              <button class="btn btn-primary" onclick="imprimirTodosClientes()">
+                <i class="fas fa-print me-1"></i> Imprimir todos los historiales
+              </button>
+            </div>
           {% endif %}
         </div>
         
@@ -246,7 +257,7 @@
       <p>Teléfono: {{ cliente.telefono|default:"No registrado" }}</p>
       <hr>
       
-      {% with turnos=cliente.turno_set.all %}
+      {% with turnos=cliente.turno_set.all|dictsortreversed:"fecha" %}
         {% if turnos %}
           <table class="table table-striped">
             <thead>
@@ -259,12 +270,14 @@
             </thead>
             <tbody>
               {% for turno in turnos %}
+                {% if not servicio or turno.servicio == servicio %}
                 <tr>
                   <td>{{ turno.fecha|date:"d/m/Y" }}</td>
                   <td>{{ turno.hora|time:"H:i" }}</td>
                   <td>{{ turno.servicio.nombre }}</td>
                   <td>{{ turno.comentario|default:"Sin comentarios" }}</td>
                 </tr>
+                {% endif %}
               {% endfor %}
             </tbody>
           </table>

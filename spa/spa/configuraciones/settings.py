@@ -129,3 +129,6 @@ DEFAULT_FROM_EMAIL = 'Spa Bienestar <spabienestar@gmail.com>'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Configuración de OpenAI
+OPENAI_API_KEY = "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"

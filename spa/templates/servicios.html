@@ -2,92 +2,176 @@
 
 {% block banner_content %}
 <div class="text-center-custom">
-  <h1 class="display-4 fw-bold">Descubra un mundo de opciones</h1>
+  <h1 class="display-4 fw-bold">Descubra un mundo de bienestar</h1>
+  <p class="lead dynamic-phrase show">Nuestros servicios están diseñados para tu relajación y belleza</p>
 </div>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5" id="servicesList">
-  {% if current_subcategoria %}
-    <h2 class="mb-4">{{ current_subcategoria.nombre }}</h2>
-  {% else %}
-    <h2 class="mb-4">Servicios</h2>
-  {% endif %}
-
-  <form method="GET" class="mb-4">
-    <div class="form-group">
-      <label for="subcategoria">Filtrar por categoría</label>
-      <select name="subcategoria" id="subcategoria" class="form-control" onchange="this.form.submit()">
-        <option value="">Seleccionar categoría</option>
-        {% for sub in subcategorias %}
-          <option value="{{ sub.id }}" {% if current_subcategoria and current_subcategoria.id == sub.id %}selected{% endif %}>
-            {{ sub.nombre }}
-          </option>
-        {% endfor %}
-      </select>
+<div class="container mt-5 mb-5" id="servicesList">
+  <div class="row mb-5">
+    <div class="col-md-8">
+      {% if current_subcategoria %}
+        <h2 class="mb-4 display-6">{{ current_subcategoria.nombre }}</h2>
+      {% else %}
+        <h2 class="mb-4 display-6">Nuestros Servicios</h2>
+      {% endif %}
+      <p class="lead text-muted">Selecciona la categoría que más te interese o explora todos nuestros tratamientos diseñados para tu bienestar.</p>
     </div>
-  </form>
+    <div class="col-md-4">
+      <div class="card bg-light border-0 shadow-sm p-3">
+        <form method="GET">
+          <div class="form-group">
+            <label for="subcategoria" class="form-label fw-bold mb-2">Filtrar por categoría</label>
+            <select name="subcategoria" id="subcategoria" class="form-select form-select-lg" onchange="this.form.submit()">
+              <option value="">Todos los servicios</option>
+              {% for sub in subcategorias %}
+                <option value="{{ sub.id }}" {% if current_subcategoria and current_subcategoria.id == sub.id %}selected{% endif %}>
+                  {{ sub.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   {% if current_subcategoria %}
     <div class="row">
       {% for servicio in servicios %}
         <div class="col-md-4 mb-4">
-          <div class="card shadow-sm h-100">
+          <div class="card shadow h-100 service-card">
             {% if servicio.imagen %}
-              <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}">
+              <div class="card-img-container">
+                <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}">
+                <div class="card-img-overlay d-flex align-items-end">
+                  <span class="badge bg-primary px-3 py-2 mb-3">$ {{ servicio.precio }}</span>
+                </div>
+              </div>
             {% endif %}
             <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ servicio.nombre }}</h5>
-              <p class="card-text">{{ servicio.descripcion }}</p>
-              <p class="card-text"><span class="badge bg-success">Precio: ${{ servicio.precio }}</span></p>
-              {% if user.is_staff %}
-                <a href="{% url 'admin_lista_turnos' servicio.id %}"
-                   class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Editar</a>
-              {% else %}
-                <a href="{% url 'calendario_servicio' servicio.id %}"
-                   class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Solicitar turno</a>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      {% empty %}
-        <p class="text-muted">No hay servicios para esta categoría.</p>
-      {% endfor %}
-    </div>
-  {% else %}
-    {% for sub in subcategorias %}
-      <h3 class="mt-5 mb-3">{{ sub.nombre }}</h3>
-      <div class="row">
-        {% for servicio in sub.servicio_set.all %}
-          <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
-              {% if servicio.imagen %}
-                <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}">
-              {% endif %}
-              <div class="card-body d-flex flex-column">
-                <h5 class="card-title">{{ servicio.nombre }}</h5>
-                <p class="card-text">{{ servicio.descripcion }}</p>
-                <p class="card-text"><span class="badge bg-success">Precio: ${{ servicio.precio }}</span></p>
+              <h5 class="card-title fw-bold">{{ servicio.nombre }}</h5>
+              <p class="card-text flex-grow-1">{{ servicio.descripcion }}</p>
+              <div class="d-flex justify-content-between align-items-center mt-3">
                 {% if user.is_staff %}
-                  <a href="{% url 'admin_lista_turnos' servicio.id %}"
-                     class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Editar</a>
+                  <a href="{% url 'admin_lista_turnos' servicio.id %}" class="btn btn-pink w-100">
+                    <i class="fas fa-edit me-2"></i>Editar
+                  </a>
                 {% else %}
-                  <a href="{% url 'calendario_servicio' servicio.id %}"
-                     class="btn btn-warning mt-auto" style="background-color: pink; border-color: white;">Solicitar turno</a>
+                  <a href="{% url 'calendario_servicio' servicio.id %}" class="btn btn-pink w-100">
+                    <i class="fas fa-calendar-check me-2"></i>Reservar ahora
+                  </a>
                 {% endif %}
               </div>
             </div>
           </div>
-        {% empty %}
-          <p class="text-muted">No hay servicios en esta categoría.</p>
-        {% endfor %}
+        </div>
+      {% empty %}
+        <div class="col-12">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> No hay servicios disponibles para esta categoría.
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% for sub in subcategorias %}
+      <div class="category-section mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h3 class="h4 mb-0">{{ sub.nombre }}</h3>
+          <a href="?subcategoria={{ sub.id }}" class="btn btn-sm btn-outline-primary">Ver todos</a>
+        </div>
+        <div class="row">
+          {% for servicio in sub.servicio_set.all|slice:":3" %}
+            <div class="col-md-4 mb-4">
+              <div class="card shadow h-100 service-card">
+                {% if servicio.imagen %}
+                  <div class="card-img-container">
+                    <img src="{{ servicio.imagen.url }}" class="card-img-top" alt="{{ servicio.nombre }}">
+                    <div class="card-img-overlay d-flex align-items-end">
+                      <span class="badge bg-primary px-3 py-2 mb-3">$ {{ servicio.precio }}</span>
+                    </div>
+                  </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title fw-bold">{{ servicio.nombre }}</h5>
+                  <p class="card-text flex-grow-1">{{ servicio.descripcion }}</p>
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    {% if user.is_staff %}
+                      <a href="{% url 'admin_lista_turnos' servicio.id %}" class="btn btn-pink w-100">
+                        <i class="fas fa-edit me-2"></i>Editar
+                      </a>
+                    {% else %}
+                      <a href="{% url 'calendario_servicio' servicio.id %}" class="btn btn-pink w-100">
+                        <i class="fas fa-calendar-check me-2"></i>Reservar ahora
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="col-12">
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i> No hay servicios disponibles en esta categoría.
+              </div>
+            </div>
+          {% endfor %}
+        </div>
       </div>
     {% endfor %}
   {% endif %}
 </div>
 
+<style>
+  .service-card {
+    transition: all 0.3s ease;
+    border: none;
+    overflow: hidden;
+  }
+  
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+  }
+  
+  .card-img-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .card-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .service-card:hover .card-img-container img {
+    transform: scale(1.05);
+  }
+  
+  .category-section {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  
+  .category-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #dee2e6, transparent);
+  }
+</style>
+
 <script>
   document.addEventListener('DOMContentLoaded', function(){
+    // Scroll al listado si hay filtro
     if (new URLSearchParams(window.location.search).has('subcategoria')) {
       const lista = document.getElementById('servicesList');
       if (lista) lista.scrollIntoView({ behavior: 'smooth' });

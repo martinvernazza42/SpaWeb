@@ -1112,18 +1112,20 @@ def historial_cliente_pdf(request, cliente_id):
         return redirect('index')
     
     prof = user.profesional
+    servicio = prof.servicio
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     
-    # Obtener todos los turnos de este cliente con este profesional
+    # Obtener todos los turnos de este cliente con este servicio
     turnos = Turno.objects.filter(
         cliente=cliente,
-        profesional=prof
+        servicio=servicio
     ).order_by('-fecha', '-hora')
     
     context = {
         'cliente': cliente,
         'turnos': turnos,
-        'profesional': prof
+        'profesional': prof,
+        'servicio': servicio
     }
     
     pdf = render_to_pdf('pdf_historial_cliente.html', context)
